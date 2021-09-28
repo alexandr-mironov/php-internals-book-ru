@@ -1,19 +1,25 @@
 # Introduction
+
 ____________
 
-This book is a collaborative effort between several developers of the PHP language to better document and describe how PHP works internally.
+Эта книга - результат совместных усилий нескольких разработчиков языка PHP, направленных на улучшение документирования и
+описания внутренней работы PHP.
 
-There are three primary goals of this book:
+Эта книга преследует три основные цели:
 
-* Document and describe how PHP internals work.
+* Задокументировать и описать как работают внутренние компоненты PHP.
 
-* Document and describe how to extend the language with extensions.
+* Задокументировать и описать как расширить язык с помощью расширений.
 
-* Document and describe how you can interact with the community to develop PHP itself.
+* Задокументировать и описать как Вы можете взаимодействовать с сообществом для разработки самого PHP.
 
-This book is primarily targeted at developers who have experience in the C programming language. However, wherever possible we will attempt to distill the information and summarize it so that developers who don’t know C well, will still be able to understand the content.
+Эта книга в первую очередь предназначена для разработчиков, имеющих опыт работы с языком программирования C. Однако,
+везде где возможно, мы попытаемся выделить информацию и обобщить ее, чтобы разработчики, которые не достаточно хорошо
+знают C все еще были в состоянии понять содержимое.
 
-However, let us insist. You won’t be able to achieve something productive, stable (crash free under any platform), performant and useful, if you don’t know the C language. Here are some pretty nice online resources about the C language itself, its ecosystem and build tools, and Operating System APIs:
+Однако, мы настаиваем. Вы не сможете добиться чего-то продуктивного, стабильного (без сбоев на любой платформе),
+производительного и полезного, если вы не знаете языка C. Вот несколько хороших онлайн-ресурсов о самом языке C, его
+экосистема и инструменты сборки, а также API операционной системы:
 
 * http://www.tenouk.com/
 
@@ -27,7 +33,8 @@ However, let us insist. You won’t be able to achieve something productive, sta
 
 * http://www.iecc.com/linker/linker10.html
 
-We also highly recommend you some books. You’ll learn with them how to efficiently use the C language, and how to make it translate to efficient CPU instructions so that you can design strong/fast/reliable and secure programs.
+We also highly recommend you some books. You’ll learn with them how to efficiently use the C language, and how to make
+it translate to efficient CPU instructions so that you can design strong/fast/reliable and secure programs.
 
 * The C Programming Language (Ritchie & Kernighan)
 
@@ -54,4 +61,6 @@ We don’t pay attention to a specific order, but add content as we feel.
 
 ```
 
-The repository for this book is available on [GitHub](https://github.com/phpinternalsbook/PHP-Internals-Book). Please report issues and provide feedback on the [issue tracker](https://github.com/phpinternalsbook/PHP-Internals-Book/issues).
+The repository for this book is available on [GitHub](https://github.com/phpinternalsbook/PHP-Internals-Book). Please
+report issues and provide feedback on the [issue tracker](https://github.com/phpinternalsbook/PHP-Internals-Book/issues)
+.

@@ -5,10 +5,10 @@ PHP internals book
 
 PHP7 и PHP8
 ____
-* [Введение](/blob/main/php7/introduction.md)
-* [Using the PHP build system](/blob/main/php7/build_system.md)
-  * [Building PHP]()
-    * [Why not use packages?]()
+* [Введение](/php7/introduction.md)
+* [Использование системы сборки PHP](/php7/build_system.md)
+  * [Сборка PHP](/php7/build_system/build_php.md)
+    * [Почему не использовать пакеты?](/php7/build_system/build_php.md#why-not-use-packages)
     * Obtaining the source code
     * Build overview
     * The ./buildconf script
