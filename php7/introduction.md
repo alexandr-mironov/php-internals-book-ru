@@ -33,8 +33,9 @@ ____________
 
 * http://www.iecc.com/linker/linker10.html
 
-We also highly recommend you some books. You’ll learn with them how to efficiently use the C language, and how to make
-it translate to efficient CPU instructions so that you can design strong/fast/reliable and secure programs.
+Мы также настоятельно рекомендуем вам несколько книг. Вместе с ними вы узнаете, как эффективно использовать язык C и как
+преобразовать его в эффективные инструкции CPU, чтобы вы могли разрабатывать сильные(??), быстрые, надежные и безопасные
+программы.
 
 * The C Programming Language (Ritchie & Kernighan)
 
@@ -54,13 +55,13 @@ it translate to efficient CPU instructions so that you can design strong/fast/re
 
 ```
 
-### Note
+### Заметка
 
-This book is Work-In-Progress and some chapters have not been written yet. 
-We don’t pay attention to a specific order, but add content as we feel.
+Эта книга находится в стадии разработки, и некоторые главы еще не написаны. Мы не обращаем внимания на конкретный порядок, а добавляем контент по своему усмотрению.
 
 ```
 
-The repository for this book is available on [GitHub](https://github.com/phpinternalsbook/PHP-Internals-Book). Please
-report issues and provide feedback on the [issue tracker](https://github.com/phpinternalsbook/PHP-Internals-Book/issues)
+Репозиторий этой книги доступен на [GitHub](https://github.com/phpinternalsbook/PHP-Internals-Book). Сообщайте о
+проблемах и оставляйте отзывы
+в [системе отслеживания проблем](https://github.com/phpinternalsbook/PHP-Internals-Book/issues)
 .
