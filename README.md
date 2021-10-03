@@ -9,8 +9,8 @@ ____
 * [Использование системы сборки PHP](/php7/build_system.md)
   * [Сборка PHP](/php7/build_system/build_php.md)
     * [Почему не использовать пакеты?](/php7/build_system/build_php.md#why-not-use-packages)
-    * Obtaining the source code
-    * Build overview
+    * [Obtaining the source code](/php7/build_system/build_php.md#obtaining-the-source-code)
+    * [Build overview](/php7/build_system/build_php.md#build-overview)
     * The ./buildconf script
     * The ./configure script
     * make and make install
