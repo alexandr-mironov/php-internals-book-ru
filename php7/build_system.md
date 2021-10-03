@@ -7,14 +7,18 @@ ___
 
 Эта глава объясняет, как Вы можете скомпилировать PHP для разработки расширений или модификаций ядра. Мы будем
 рассматривать сборки только для Unix-образных систем. Если вы хотите собрать PHP в Windows, вам следует взглянуть на
-пошаговые инструкции по сборке в вики PHP.
+пошаговые инструкции по сборке в вики PHP [[1]](#disclaimer1).
 
-This chapter also provides an overview of how the PHP build system works and which tools it uses, but a detailed
-description is outside the scope of this book.
+В этой главе также представлен обзор того, как работает система сборки PHP и какие инструменты она использует, но
+подробное описание выходит за рамки этой книги.
 
-1 Disclaimer: We are not liable for any adverse health effects caused by the attempt to compile PHP on Windows.
+<a href="#disclaimer1">Отказ от ответственности:</a>
+```
+Мы не несем ответственности за какие-либо неблагоприятные последствия для здоровья,
+вызванные попыткой скомпилировать PHP для Windows.
+```
 
-## Why not use packages?
+## <a name="#why-not-use-packages">Why not use packages?</a>
 
 ___
 If you are currently using PHP, you likely installed it through your package manager, using a command like sudo apt-get
