@@ -2,6 +2,7 @@
 ___
 
 # Сборка PHP
+
 ___
 
 Эта глава объясняет, как Вы можете скомпилировать PHP для разработки расширений или модификаций ядра. Мы будем
@@ -19,10 +20,11 @@ ___
 ```
 
 ## <a name="#why-not-use-packages">Почему бы не использовать пакеты?</a>
+
 _____
-If you are currently using PHP, you likely installed it through your package manager, using a command
-like ```sudo apt-get install php```. Before explaining the actual compilation you should first understand why doing your
-own compile is necessary and you can’t just use a prebuilt package. There are multiple reasons for this:
+Если Вы уже используете PHP, Вы, вероятно, установили его через диспетчер пакетов, используя команду например ```sudo
+apt-get install php```. Прежде чем объяснять собственно компиляцию, вы должны сначала понять, почему Вам необходимо
+скомпилировать самим и почему нельзя использовать готовую сборку. Для этого есть несколько причин:
 
 Firstly, the prebuilt package only contains the resulting binaries, but misses other things that are necessary to
 compile extensions, e.g. header files. This can be easily remedied by installing a development package, which is
@@ -44,6 +46,7 @@ extension-writing, you should always work against the official PHP version. When
 always referring to the officially supported version.
 
 ## <a name="obtaining-the-source-code">Получение исходного кода</a>
+
 _____
 
 Before you can build PHP you first need to obtain its source code. There are two ways to do this: You can either
@@ -110,11 +113,13 @@ On Debian/Ubuntu you can install all these with the following command:
 ``` 
 
 Depending on the extensions that you enable during the ```./configure``` stage PHP will need a number of additional
-libraries. When installing these, check if there is a version of the package ending in ```-dev``` or ```-devel``` and install them
-instead. The packages without ```dev``` typically do not contain necessary header files. For example a default PHP build will
-require libxml and libsqlite3, which you can install via the ```libxml2-dev``` and ```libsqlite3-dev``` packages.
+libraries. When installing these, check if there is a version of the package ending in ```-dev``` or ```-devel``` and
+install them instead. The packages without ```dev``` typically do not contain necessary header files. For example a
+default PHP build will require libxml and libsqlite3, which you can install via the ```libxml2-dev```
+and ```libsqlite3-dev``` packages.
 
 ## <a name="#build-overview">Обзор процесса сборки</a>
+
 _____
 
 Before taking a closer look at what the individual build steps do, here are the commands you need to execute for a
@@ -128,11 +133,12 @@ Before taking a closer look at what the individual build steps do, here are the 
 
 For a fast build, replace N with the number of CPU cores you have available (you can run ```nproc``` to determine this).
 
-By default PHP will build binaries for the CLI and CGI SAPIs, which will be located at ```sapi/cli/php``` and ```sapi/cgi/php-cgi```
+By default PHP will build binaries for the CLI and CGI SAPIs, which will be located at ```sapi/cli/php```
+and ```sapi/cgi/php-cgi```
 respectively. To check that everything went well, try running ```sapi/cli/php -v```.
 
-Additionally you can run ```sudo make install``` to install PHP into ```/usr/local```. The target directory can be changed by
-specifying a ```--prefix``` in the configuration stage:
+Additionally you can run ```sudo make install``` to install PHP into ```/usr/local```. The target directory can be
+changed by specifying a ```--prefix``` in the configuration stage:
 
 ```shell
 ~/php-src> ./configure --prefix=$HOME/myphp
@@ -140,19 +146,23 @@ specifying a ```--prefix``` in the configuration stage:
 ~/php-src> make install
 ```
 
-Here ```$HOME/myphp``` is the installation location that will be used during the ```make install``` step. Note that installing PHP
-is not necessary, but can be convenient if you want to use your PHP build outside of extension development.
+Here ```$HOME/myphp``` is the installation location that will be used during the ```make install``` step. Note that
+installing PHP is not necessary, but can be convenient if you want to use your PHP build outside of extension
+development.
 
 Now lets take a closer look at the individual build steps!
 
 ## <a name="#the-buildconf-script">The ./buildconf script</a>
+
 _____
 
 If you are building from the git repository, the first thing you’ll have to do is run the ```./buildconf``` script. This
 script does little more than invoking the ```build/build.mk``` makefile, which in turn calls ```build/build2.mk```.
 
-The main job of these makefiles is to run ```autoconf``` to generate the ```./configure``` script and ```autoheader``` to generate the
-```main/php_config.h.in``` template. The latter file will be used by configure to generate the final configuration header file
+The main job of these makefiles is to run ```autoconf``` to generate the ```./configure``` script and ```autoheader```
+to generate the
+```main/php_config.h.in``` template. The latter file will be used by configure to generate the final configuration
+header file
 ```main/php_config.h```.
 
 Both utilities produce their results from the configure.ac file (which specifies most of the PHP build process), the
@@ -160,24 +170,26 @@ Both utilities produce their results from the configure.ac file (which specifies
 extensions and SAPIs (as well as a bunch of other [m4 files](http://www.gnu.org/software/m4/m4.html)).
 
 The good news is that writing extensions or even doing core modifications will not require much interaction with the
-build system. You will have to write small ```config.m4``` files later on, but those usually just use two or three of the
-high-level macros that ```build/php.m4``` provides. As such we will not go into further detail here.
+build system. You will have to write small ```config.m4``` files later on, but those usually just use two or three of
+the high-level macros that ```build/php.m4``` provides. As such we will not go into further detail here.
 
-The ```./buildconf``` script only has two options: ```--debug``` will disable warning suppression when calling autoconf and
-autoheader. Unless you want to work on the buildsystem, this option will be of little interest to you.
+The ```./buildconf``` script only has two options: ```--debug``` will disable warning suppression when calling autoconf
+and autoheader. Unless you want to work on the buildsystem, this option will be of little interest to you.
 
-The second option is ```--force```, which will allow running ```./buildconf``` in release packages (e.g. if you downloaded the
-packaged source code and want to generate a new ```./configure```) and additionally clear the configuration caches
+The second option is ```--force```, which will allow running ```./buildconf``` in release packages (e.g. if you
+downloaded the packaged source code and want to generate a new ```./configure```) and additionally clear the
+configuration caches
 ```config.cache``` and ```autom4te.cache/```.
 
 If you update your git repository using git pull (or some other command) and get weird errors during the make step, this
 usually means that something in the build configuration changed and you need to rerun ./buildconf.
 
 ## <a name="#the-configure-script">The ./configure script</a>
+
 _____
 
-Once the ```./configure``` script is generated you can make use of it to customize your PHP build. You can list all supported
-options using ```--help```:
+Once the ```./configure``` script is generated you can make use of it to customize your PHP build. You can list all
+supported options using ```--help```:
 
 ```shell
 ~/php-src> ./configure --help | less 
@@ -269,29 +281,30 @@ switch, so only the CLI binary is generated.
 
 There are three more switches, which you should usually specify when developing extensions or working on PHP:
 
-```--enable-debug``` enables debug mode, which has multiple effects: Compilation will run with -g to generate debug symbols
-and additionally use the lowest optimization level -O0. This will make PHP a lot slower, but make debugging with tools
-like gdb more predictable. Furthermore debug mode defines the ```ZEND_DEBUG``` macro, which will enable th use of assertions
-and enable various debugging helpers in the engine. Among other things memory leaks, as well as incorrect use of some
-data structures, will be reported. It is possible to enable debug assertions without disabling optimizations by using
+```--enable-debug``` enables debug mode, which has multiple effects: Compilation will run with -g to generate debug
+symbols and additionally use the lowest optimization level -O0. This will make PHP a lot slower, but make debugging with
+tools like gdb more predictable. Furthermore debug mode defines the ```ZEND_DEBUG``` macro, which will enable th use of
+assertions and enable various debugging helpers in the engine. Among other things memory leaks, as well as incorrect use
+of some data structures, will be reported. It is possible to enable debug assertions without disabling optimizations by
+using
 ```--enable-debug-assertions``` instead.
 
-```--enable-zts``` (or ```--enable-maintainer-zts``` before PHP 8.0) enables thread-safety. This switch will define the ZTS macro,
-which in turn will enable the whole TSRM (thread-safe resource manager) machinery used by PHP. Since PHP 7 having this
-switch continuously enabled is much less important than on previous versions. It is primarily important to make sure you
-included all the necessary boilerplate code. If you need more information about thread safety and global memory
-management in PHP, you should read the globals management chapter
+```--enable-zts``` (or ```--enable-maintainer-zts``` before PHP 8.0) enables thread-safety. This switch will define the
+ZTS macro, which in turn will enable the whole TSRM (thread-safe resource manager) machinery used by PHP. Since PHP 7
+having this switch continuously enabled is much less important than on previous versions. It is primarily important to
+make sure you included all the necessary boilerplate code. If you need more information about thread safety and global
+memory management in PHP, you should read the globals management chapter
 
-```--enable-werror``` (since PHP 7.4) enables the ```-Werror``` compiler flag, which will promote compiler warnings to errors.
-Enabling this flag ensures that the PHP build remains warning free. However, generated warnings depend on the used
-compiler, version and optimizatino options, so some compilers may not be usable with option.
+```--enable-werror``` (since PHP 7.4) enables the ```-Werror``` compiler flag, which will promote compiler warnings to
+errors. Enabling this flag ensures that the PHP build remains warning free. However, generated warnings depend on the
+used compiler, version and optimizatino options, so some compilers may not be usable with option.
 
 On the other hand you should not use the --enable-debug option if you want to perform performance benchmarks for your
 code. --enable-zts can also negatively impact runtime performance.
 
-Note that ```--enable-debug``` and ```--enable-zts``` change the ABI of the PHP binary, e.g. by adding additional arguments to
-functions. As such, shared extensions compiled in debug mode will not be compatible with a PHP binary built in release
-mode. Similarly a thread-safe extension (ZTS) is not compatible with a non-thread-safe PHP build (NTS).
+Note that ```--enable-debug``` and ```--enable-zts``` change the ABI of the PHP binary, e.g. by adding additional
+arguments to functions. As such, shared extensions compiled in debug mode will not be compatible with a PHP binary built
+in release mode. Similarly a thread-safe extension (ZTS) is not compatible with a non-thread-safe PHP build (NTS).
 
 Due to the ABI incompatibility make install (and PECL install) will put shared extensions in different directories
 depending on these options:
@@ -328,7 +341,8 @@ CFLAGS="-fsanitize=address -fsanitize=undefined"
 
 These options only work reliably since PHP 7.4 and will significantly slow down the generated PHP binary.
 
-## <a name="#make-and-make-install">make and make install</a> 
+## <a name="#make-and-make-install">make and make install</a>
+
 _____
 After everything is configured, you can use make to perform the actual compilation:
 
