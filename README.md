@@ -8,12 +8,12 @@ ____
 * [Введение](/php7/introduction.md)
 * [Использование системы сборки PHP](/php7/build_system.md)
   * [Сборка PHP](/php7/build_system/build_php.md)
-    * [Почему не использовать пакеты?](/php7/build_system/build_php.md#why-not-use-packages)
-    * [Obtaining the source code](/php7/build_system/build_php.md#obtaining-the-source-code)
-    * [Build overview](/php7/build_system/build_php.md#build-overview)
-    * The ./buildconf script
-    * The ./configure script
-    * make and make install
+    * [Почему бы не использовать пакеты?](/php7/build_system/build_php.md#why-not-use-packages)
+    * [Получение исходного кода](/php7/build_system/build_php.md#obtaining-the-source-code)
+    * [Обзор процесса сборки](/php7/build_system/build_php.md#build-overview)
+    * [The ```./buildconf``` script](/php7/build_system/build_php.md#the-buildconf-script)
+    * [The ```./configure``` script](/php7/build_system/build_php.md#the-configure-script)
+    * [```make``` and ```make install```](/php7/build_system/build_php.md#make-and-make-install)
     * Running the test suite
     * Fixing compilation problems and make clean
   * Building PHP extensions
