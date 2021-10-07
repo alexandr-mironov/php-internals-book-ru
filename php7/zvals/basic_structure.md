@@ -88,43 +88,20 @@ Resources (IS_RESOURCE) are use the zend_resource *res member. Resources are cov
 To summarize, here’s a table with all the available “normal” type tags and the corresponding storage location for their
 values:
 
-Type tag
+| Type tag | Storage location |
+| --- | --- |
+| ```IS_NULL``` | none |
+| ```IS_TRUE``` or ```IS_FALSE``` | none |
+| ```IS_LONG``` | ```zend_long lval``` |
+| ```IS_DOUBLE``` | ```double dval``` |
+| ```IS_STRING``` | ```zend_string *str``` |
+| ```IS_ARRAY``` | ```zend_array *arr``` |
+| ```IS_OBJECT``` | ```zend_object *obj``` |
+| ```IS_RESOURCE``` | ```zend_resource *res``` |
 
-Storage location
+### Special types 
 
-IS_NULL
-
-none
-
-IS_TRUE or IS_FALSE
-
-none
-
-IS_LONG
-
-zend_long lval
-
-IS_DOUBLE
-
-double dval
-
-IS_STRING
-
-zend_string *str
-
-IS_ARRAY
-
-zend_array *arr
-
-IS_OBJECT
-
-zend_object *obj
-
-IS_RESOURCE
-
-zend_resource *res
-
-Special types There are a number of additional types that do not have a directly corresponding userland type, and are
+There are a number of additional types that do not have a directly corresponding userland type, and are
 only used internally. Of these, IS_UNDEF and IS_REFERENCE are the only types you will encounter routinely.
 
 The IS_UNDEF type is used to indicate an uninitialized zval. This type tag has a value of zero, so zeroing out a zval
@@ -152,16 +129,42 @@ zvals, such as hashtable values.
 The zend_class_entry *ce and zend_function *func members just specify a more precise type, but otherwise serve the same
 purpose as ptr.
 
-The zval struct Let’s now have a look at how the zval struct actually looks like:
+## The zval struct 
+_____
 
-struct _zval_struct { zend_value value; union { uint32_t type_info; struct { ZEND_ENDIAN_LOHI_3(
-zend_uchar type, zend_uchar type_flags, union { uint16_t extra; } u)
-} v; } u1; union { uint32_t next; /* hash collision chain */ uint32_t cache_slot; /* cache slot (for RECV_INIT) */
-uint32_t opline_num; /* opline number (for FAST_CALL) */ uint32_t lineno; /* line number (for ast nodes) */ uint32_t
-num_args; /* arguments number for EX(This) */ uint32_t fe_pos; /* foreach position */ uint32_t fe_iter_idx; /* foreach
-iterator index */ uint32_t access_flags; /* class constant access flags */ uint32_t property_guard; /* single property
-guard */ uint32_t constant_flags; /* constant flags */ uint32_t extra; /* not further specified */ } u2; }; This
-structure looks a bit more complicated than it really is. At its core, it stores an 8 byte value and a single byte type
+Let’s now have a look at how the zval struct actually looks like:
+
+```
+struct _zval_struct { 
+    zend_value value; 
+    union { 
+        uint32_t type_info; 
+        struct { 
+            ZEND_ENDIAN_LOHI_3(
+                zend_uchar type, 
+                zend_uchar type_flags, 
+                union { 
+                    uint16_t extra; 
+                } u)
+        } v; 
+    } u1; 
+    union { 
+        uint32_t next;              /* hash collision chain */ 
+        uint32_t cache_slot;        /* cache slot (for RECV_INIT) */
+        uint32_t opline_num;        /* opline number (for FAST_CALL) */ 
+        uint32_t lineno;            /* line number (for ast nodes) */ 
+        uint32_t num_args;          /* arguments number for EX(This) */ 
+        uint32_t fe_pos;            /* foreach position */ 
+        uint32_t fe_iter_idx;       /* foreach iterator index */ 
+        uint32_t access_flags;      /* class constant access flags */ 
+        uint32_t property_guard;    /* single property guard */ 
+        uint32_t constant_flags;    /* constant flags */ 
+        uint32_t extra;             /* not further specified */ 
+    } u2; 
+}; 
+```
+
+This structure looks a bit more complicated than it really is. At its core, it stores an 8 byte value and a single byte type
 tag, both of which we have already discussed above.
 
 This would theoretically leave us with a zval size of 9 bytes. However, to allow efficient access, it is necessary to
@@ -179,164 +182,122 @@ usages as well. It should be noted that standard zval macros will never modify o
 The u1.v.u.extra field that is part of the type is very rarely used to also store additional information. However, use
 of this field is only possible in very specific circumstances, as PHP will usually assume that it is zero.
 
-Access macros Knowing the zval structure you can now write code making use of it:
+## Access macros 
+___
 
+Knowing the zval structure you can now write code making use of it:
+
+```
 zval *zv_ptr = /* ... get zval from somewhere */;
 
-if (zv_ptr->u1.v.type == IS_LONG) { php_printf("Zval is a long with value " ZEND_LONG_FMT "\n", zv_ptr->value.lval); }
-else /* ... handle other types */ While the above code works, this is not the idiomatic way to write it. It directly
+if (zv_ptr->u1.v.type == IS_LONG) { 
+    php_printf("Zval is a long with value " ZEND_LONG_FMT "\n", zv_ptr->value.lval); 
+} else /* ... handle other types */
+``` 
+
+While the above code works, this is not the idiomatic way to write it. It directly
 accesses the zval members rather than using a special set of access macros for this purpose:
 
+```
 zval *zv_ptr = /* ... */;
 
-if (Z_TYPE_P(zv_ptr) == IS_LONG) { php_printf("Zval is a long with value " ZEND_LONG_FMT "\n", Z_LVAL_P(zv_ptr)); } else
-/* ... */ The above code uses the Z_TYPE_P() macro for retrieving the type tag and Z_LVAL_P() to get the long (integer)
+if (Z_TYPE_P(zv_ptr) == IS_LONG) { 
+    php_printf("Zval is a long with value " ZEND_LONG_FMT "\n", Z_LVAL_P(zv_ptr)); 
+} else /* ... */ 
+```
+
+The above code uses the Z_TYPE_P() macro for retrieving the type tag and Z_LVAL_P() to get the long (integer)
 value. All the access macros have variants with a _P (for “pointer”) suffix or no suffix at all. Which one you use
 depends on whether you are working on a zval or a zval*
 
+```
 zval zv; zval *zv_ptr;
 
-Z_TYPE(zv); // Same as Z_TYPE_P(&zv). Z_TYPE_P(zv_ptr); // Same as Z_TYPE(*zv_ptr). Similarly to Z_LVAL there are also
-macros for fetching values of all the other types. To demonstrate their usage we’ll create a simple function for dumping
-a zval:
+Z_TYPE(zv); // Same as Z_TYPE_P(&zv). Z_TYPE_P(zv_ptr); // Same as Z_TYPE(*zv_ptr). 
+```
 
+Similarly to Z_LVAL there are also macros for fetching values of all the other types. To demonstrate their usage we’ll create a simple function for dumping a zval:
+```
 PHP_FUNCTION(dump)
-{ zval *zv_ptr;
+{ 
+    zval *zv_ptr;
 
     if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &zv_ptr) == FAILURE) {
         return;
     }
 
 try_again:
-switch (Z_TYPE_P(zv_ptr)) { case IS_NULL:
-php_printf("NULL: null\n"); break; case IS_TRUE:
-php_printf("BOOL: true\n"); break; case IS_FALSE:
-php_printf("BOOL: false\n"); break; case IS_LONG:
-php_printf("LONG: %ld\n", Z_LVAL_P(zv_ptr)); break; case IS_DOUBLE:
-php_printf("DOUBLE: %g\n", Z_DVAL_P(zv_ptr)); break; case IS_STRING:
-php_printf("STRING: value=\""); PHPWRITE(Z_STRVAL_P(zv_ptr), Z_STRLEN_P(zv_ptr)); php_printf("\", length=%zd\n",
-Z_STRLEN_P(zv_ptr)); break; case IS_RESOURCE:
-php_printf("RESOURCE: id=%d\n", Z_RES_HANDLE_P(zv_ptr)); break; case IS_ARRAY:
-php_printf("ARRAY: hashtable=%p\n", Z_ARRVAL_P(zv_ptr)); break; case IS_OBJECT:
-php_printf("OBJECT: object=%p\n", Z_OBJ_P(zv_ptr)); break; case IS_REFERENCE:
-// For references, remove the reference wrapper and try again. // Yes, you are allowed to use goto for this purpose!
-php_printf("REFERENCE: "); zv_ptr = Z_REFVAL_P(zv_ptr); goto try_again; EMPTY_SWITCH_DEFAULT_CASE() // Assert that all
-types are handled. } } Lets try it out:
+    switch (Z_TYPE_P(zv_ptr)) { 
+        case IS_NULL:
+            php_printf("NULL: null\n"); 
+            break; 
+        case IS_TRUE:
+            php_printf("BOOL: true\n"); 
+            break; 
+        case IS_FALSE:
+            php_printf("BOOL: false\n"); 
+            break; 
+        case IS_LONG:
+            php_printf("LONG: %ld\n", Z_LVAL_P(zv_ptr)); 
+            break; 
+        case IS_DOUBLE:
+            php_printf("DOUBLE: %g\n", Z_DVAL_P(zv_ptr)); 
+            break; 
+        case IS_STRING:
+            php_printf("STRING: value=\""); 
+            PHPWRITE(Z_STRVAL_P(zv_ptr), Z_STRLEN_P(zv_ptr)); 
+            php_printf("\", length=%zd\n", Z_STRLEN_P(zv_ptr)); 
+            break; 
+        case IS_RESOURCE:
+            php_printf("RESOURCE: id=%d\n", Z_RES_HANDLE_P(zv_ptr)); 
+            break; 
+        case IS_ARRAY:
+            php_printf("ARRAY: hashtable=%p\n", Z_ARRVAL_P(zv_ptr)); 
+            break; 
+        case IS_OBJECT:
+            php_printf("OBJECT: object=%p\n", Z_OBJ_P(zv_ptr)); 
+            break; 
+        case IS_REFERENCE:
+            // For references, remove the reference wrapper and try again. 
+            // Yes, you are allowed to use goto for this purpose!
+            php_printf("REFERENCE: "); 
+            zv_ptr = Z_REFVAL_P(zv_ptr); 
+            goto try_again; 
+        EMPTY_SWITCH_DEFAULT_CASE() // Assert that all types are handled. 
+    } 
+} 
+```
+Lets try it out:
 
-dump(null); // NULL: null dump(true); // BOOL: true dump(false); // BOOL: false dump(42); // LONG: 42 dump(4.2); //
-DOUBLE: 4.2 dump("foo"); // STRING: value="foo", length=3 dump(fopen(__FILE__, "r")); // RESOURCE: id=??? dump(array(1,
-2, 3)); // ARRAY: hashtable=0x??? dump(new stdClass); // OBJECT: object=0x??? The following table summarizes the most
+```
+dump(null); // NULL: null 
+dump(true); // BOOL: true 
+dump(false); // BOOL: false 
+dump(42); // LONG: 42 
+dump(4.2); // DOUBLE: 4.2 
+dump("foo"); // STRING: value="foo", length=3 
+dump(fopen(__FILE__, "r")); // RESOURCE: id=??? 
+dump(array(1,2, 3)); // ARRAY: hashtable=0x??? 
+dump(new stdClass); // OBJECT: object=0x??? 
+```
+The following table summarizes the most
 commonly used accessor macros, though there are quite a few more than that.
 
-Macro
-
-Returned type
-
-Required zval type
-
-Description
-
-Z_TYPE
-
-unsigned char
-
-Type of the zval. One of the IS_* constants.
-
-Z_LVAL
-
-zend_long
-
-IS_LONG
-
-Integer value.
-
-Z_DVAL
-
-double
-
-IS_DOUBLE
-
-Floating-point value.
-
-Z_STR
-
-zend_string *
-
-IS_STRING
-
-Pointer to full zend_string structure.
-
-Z_STRVAL
-
-char *
-
-IS_STRING
-
-String contents of the zend_string struct.
-
-Z_STRLEN
-
-size_t
-
-IS_STRING
-
-String length of the zend_string struct.
-
-Z_ARR
-
-HashTable *
-
-IS_ARRAY
-
-Pointer to HashTable structure.
-
-Z_ARRVAL
-
-HashTable *
-
-IS_ARRAY
-
-Alias of Z_ARR.
-
-Z_OBJ
-
-zend_object *
-
-IS_OBJECT
-
-Pointer to zend_object structure.
-
-Z_OBJCE
-
-zend_class_entry *
-
-IS_OBJECT
-
-Class entry of the object.
-
-Z_RES
-
-zend_resource *
-
-IS_RESOURCE
-
-Pointer to zend_resource structure.
-
-Z_REF
-
-zend_reference *
-
-IS_REFERENCE
-
-Pointer to zend_reference structure.
-
-Z_REFVAL
-
-zval *
-
-IS_REFERENCE
-
-Pointer to the zval the reference wraps.
+| Macro | Returned type | Required zval type | Description |
+| --- | --- | --- | --- |
+| Z_TYPE | unsigned char | | Type of the zval. One of the IS_* constants. |
+| Z_LVAL | zend_long | IS_LONG | Integer value. |
+| Z_DVAL | double | IS_DOUBLE | Floating-point value. |
+| Z_STR | zend_string * | IS_STRING | Pointer to full zend_string structure. |
+| Z_STRVAL | char * | IS_STRING | String contents of the zend_string struct. |
+| Z_STRLEN | size_t | IS_STRING | String length of the zend_string struct. |
+| Z_ARR | HashTable * | IS_ARRAY | Pointer to HashTable structure. |
+| Z_ARRVAL | HashTable * | IS_ARRAY | Alias of Z_ARR. |
+| Z_OBJ | zend_object * | IS_OBJECT | Pointer to zend_object structure. |
+| Z_OBJCE | zend_class_entry * | IS_OBJECT | Class entry of the object. |
+| Z_RES | zend_resource * | IS_RESOURCE | Pointer to zend_resource structure. |
+| Z_REF | zend_reference * | IS_REFERENCE | Pointer to zend_reference structure. |
+| Z_REFVAL | zval * | IS_REFERENCE | Pointer to the zval the reference wraps. |
 
 When you want to access the contents of a zval, you should always go through these macros, rather than directly
 accessing its members. This maintains a level of abstraction and will, to some degree, insulate you from changes in the
