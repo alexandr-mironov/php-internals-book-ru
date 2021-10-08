@@ -82,15 +82,16 @@ The remaining four types will only be mentioned here quickly and discussed in gr
 
 Strings (```IS_STRING```) are stored in a zend_string structure, which combines the string length and the string
 constants in a single allocation. You will find more information about the zend_string structure and its dedicated API
-in the string chapter.
+in the [string](/php7/internal_types/strings.md) chapter.
 
 Arrays use the IS_ARRAY type tag and are stored in the zend_array *arr member. How the HashTable structure works will be
-discussed in the Hashtables chapter.
+discussed in the [Hashtables](/php7/internal_types/hashtables.md) chapter.
 
 Objects (```IS_OBJECT```) use the ```zend_object *obj``` member. PHP’s class and object system will be described in the
-objects chapter.
+[objects](/php7/internal_types/objects.md) chapter.
 
-Resources (```IS_RESOURCE```) are use the zend_resource *res member. Resources are covered in the Resources chapter.
+Resources (```IS_RESOURCE```) are use the ```zend_resource *res``` member. Resources are covered in
+the [Resources](/php7/internal_types/zend_resources.md) chapter.
 
 To summarize, here’s a table with all the available “normal” type tags and the corresponding storage location for their
 values:
@@ -120,11 +121,12 @@ reference. While from a userland perspective references are not a separate type,
 as a wrapper around another zval, that can be shared by multiple places.
 
 The ```zend_refcounted *counted``` member accesses a common header for all reference-counted types, including strings,
-arrays, objects, resources and references. How this works is discussed in the memory management chapter.
+arrays, objects, resources and references. How this works is discussed in
+the [memory management](/php7/zvals/memory_management.md) chapter.
 
 The ```IS_CONSTANT_AST``` type and zend_ast_ref *ast member are used to store unevaluated constant expression abstract
 syntax trees (ASTs). It can occur only in specific places, such as property default values. ASTs will be discussed in
-the compiler chapter.
+the [compiler](/php7/zend_engine/zend_compiler.md) chapter.
 
 The ```IS_INDIRECT``` type and ```zval *zv``` member are used to store a direct pointer to another zval. This is used
 primarily for symbol types and dynamic property tables, in order to point to an actual value stored elsewhere.
@@ -133,8 +135,8 @@ The ```IS_PTR``` type together with the ```void *ptr``` field are used to store 
 type can be converted into void * and the other way around. This is used to store pointers in places that normally only
 accept zvals, such as hashtable values.
 
-The zend_class_entry *ce and zend_function *func members just specify a more precise type, but otherwise serve the same
-purpose as ptr.
+The ```zend_class_entry *ce``` and ```zend_function *func``` members just specify a more precise type, but otherwise
+serve the same purpose as ptr.
 
 ## The zval struct
 
@@ -180,8 +182,8 @@ align the structure size of an 8 byte boundary, such that the total size becomes
 be used anyway, PHP makes some use of the “wasted” space:
 
 The type tag is part of a larger type_info structure, which additionally stores type_flags. As of PHP 7.4 there are only
-two type flags: ```IS_TYPE_REFCOUNTED``` indicates that the value is reference-counted, while ```IS_TYPE_COLLECTABLE``` indicates
-that it participates in circular garbage collection. We will discuss both of these in the future.
+two type flags: ```IS_TYPE_REFCOUNTED``` indicates that the value is reference-counted, while ```IS_TYPE_COLLECTABLE```
+indicates that it participates in circular garbage collection. We will discuss both of these in the future.
 
 The u2 member is a 32-bit space to store arbitrary data, and is used for different purposes depending on context.
 Hashtables use it to store the collision resolution chain, but as the above comments indicate, there are many other
@@ -282,15 +284,15 @@ try_again:
 Lets try it out:
 
 ```
-dump(null); // NULL: null 
-dump(true); // BOOL: true 
-dump(false); // BOOL: false 
-dump(42); // LONG: 42 
-dump(4.2); // DOUBLE: 4.2 
-dump("foo"); // STRING: value="foo", length=3 
+dump(null);                 // NULL: null 
+dump(true);                 // BOOL: true 
+dump(false);                // BOOL: false 
+dump(42);                   // LONG: 42 
+dump(4.2);                  // DOUBLE: 4.2 
+dump("foo");                // STRING: value="foo", length=3 
 dump(fopen(__FILE__, "r")); // RESOURCE: id=??? 
-dump(array(1,2, 3)); // ARRAY: hashtable=0x??? 
-dump(new stdClass); // OBJECT: object=0x??? 
+dump(array(1,2, 3));        // ARRAY: hashtable=0x??? 
+dump(new stdClass);         // OBJECT: object=0x??? 
 ```
 
 The following table summarizes the most commonly used accessor macros, though there are quite a few more than that.
