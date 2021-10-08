@@ -1,23 +1,25 @@
-# Basic structure 
+# Basic structure
+
 ___
 
-A zval (short for “Zend value”) represents an arbitrary PHP value. As such it is likely the most
-important structure in all of PHP and you’ll be working with it a lot. This section describes the basic concepts behind
-zvals and their use.
+A zval (short for “Zend value”) represents an arbitrary PHP value. As such it is likely the most important structure in
+all of PHP and you’ll be working with it a lot. This section describes the basic concepts behind zvals and their use.
 
 ## Types and values
+
 _____
 
-Among other things, every zval stores some value and the type this value has. This is necessary because
-PHP is a dynamically typed language and as such variable types are only known at run-time and not at compile-time.
-Furthermore, the type can change during the life of a zval, so if the zval previously stored an integer it may contain a
-string at a later point in time.
+Among other things, every zval stores some value and the type this value has. This is necessary because PHP is a
+dynamically typed language and as such variable types are only known at run-time and not at compile-time. Furthermore,
+the type can change during the life of a zval, so if the zval previously stored an integer it may contain a string at a
+later point in time.
 
 The type is stored as an integer tag, which can take one of several values. Some values correspond to the eight types
 available in PHP, others are used for internal engine purposes only. These values are referred to using constants of the
 form ```IS_TYPE```. E.g. ```IS_NULL``` corresponds to the null type and ```IS_STRING``` corresponds to the string type.
 
 The actual value is stored in a union, which is defined as follows:
+
 ```C
 typedef union _zend_value { 
     zend_long        lval; // For IS_LONG 
@@ -39,9 +41,10 @@ typedef union _zend_value {
     } ww; 
 } zend_value; 
 ```
-To those not familiar with the concept of unions: A union defines multiple members of different types, but
-only one of them can ever be used at a time. E.g. if the value.lval member was set, then you also need to look up the
-value using value.lval and not one of the other members (doing so would violate “strict aliasing” guarantees and lead to
+
+To those not familiar with the concept of unions: A union defines multiple members of different types, but only one of
+them can ever be used at a time. E.g. if the ```value.lval``` member was set, then you also need to look up the value
+using ```value.lval``` and not one of the other members (doing so would violate “strict aliasing” guarantees and lead to
 undefined behaviour). The reason is that unions store all their members at the same memory location and just interpret
 the value located there differently depending on which member you access. The size of the union is the size of its
 largest member.
@@ -49,23 +52,27 @@ largest member.
 When working with zvals the type tag is used to find out which of the union’s member is currently in use. Before having
 a look at the APIs used to do so, let’s walk through the different types PHP supports and how they are stored:
 
-The simplest type is IS_NULL: It doesn’t need to actually store any value, because there is just one null value.
+The simplest type is ```IS_NULL```: It doesn’t need to actually store any value, because there is just one null value.
 
-Booleans use either the IS_TRUE or IS_FALSE types and don’t need to store a value either. PHP internally represents true
-and false as separate types for efficiency reasons, even though these are considered values from a user perspective.
-There also exists an _IS_BOOL type, however it is never used as a zval type. It is used internally to indicate casts to
-boolean and similar purposes.
+Booleans use either the ```IS_TRUE``` or ```IS_FALSE``` types and don’t need to store a value either. PHP internally
+represents true and false as separate types for efficiency reasons, even though these are considered values from a user
+perspective. There also exists an ```_IS_BOOL``` type, however it is never used as a zval type. It is used internally to
+indicate casts to boolean and similar purposes.
 
-For storing numbers PHP provides the types IS_LONG and IS_DOUBLE, which make use of the zend_long lval and double dval
-members respectively. The former is used to store integers, whereas the latter stores floating point numbers.
+For storing numbers PHP provides the types ```IS_LONG``` and ```IS_DOUBLE```, which make use of the zend_long lval and
+double dval members respectively. The former is used to store integers, whereas the latter stores floating point
+numbers.
 
 There are some things that one should be aware of about the zend_long type: Firstly, this is a signed integer type, i.e.
 it can store both positive and negative integers, but is commonly not well suited for doing bitwise operations.
 Secondly, zend_long is not the same as long, because it abstracts away platform differences. zend_long is always 4 bytes
 large on 32-bit platorms and 8 bytes large on 64-bit platforms, even if the long type may have a different size.
 
-For this reason, is is important to use macros written specifically for use with zend_long, such as SIZEOF_ZEND_LONG or
-ZEND_LONG_MAX. You can find more relevant macros in Zend/zend_long.h.
+For this reason, is is important to use macros written specifically for use with zend_long, such
+as ```SIZEOF_ZEND_LONG``` or
+```ZEND_LONG_MAX```. You can find more relevant macros
+in **[Zend/zend_long.h](https://github.com/php/php-src/blob/1a0fa12753931dba9908161df0f63feb6d0ba025/Zend/zend_long.h)**
+.
 
 The double type used to store floating point numbers is an 8-byte value following the IEEE-754 specification. The
 details of this format won’t be discussed here, but you should at least be aware of the fact that this type has limited
@@ -73,17 +80,17 @@ precision and commonly doesn’t store the exact value you want.
 
 The remaining four types will only be mentioned here quickly and discussed in greater detail in their own chapters:
 
-Strings (IS_STRING) are stored in a zend_string structure, which combines the string length and the string constants in
-a single allocation. You will find more information about the zend_string structure and its dedicated API in the string
-chapter.
+Strings (```IS_STRING```) are stored in a zend_string structure, which combines the string length and the string
+constants in a single allocation. You will find more information about the zend_string structure and its dedicated API
+in the string chapter.
 
 Arrays use the IS_ARRAY type tag and are stored in the zend_array *arr member. How the HashTable structure works will be
 discussed in the Hashtables chapter.
 
-Objects (IS_OBJECT) use the zend_object *obj member. PHP’s class and object system will be described in the objects
-chapter.
+Objects (```IS_OBJECT```) use the ```zend_object *obj``` member. PHP’s class and object system will be described in the
+objects chapter.
 
-Resources (IS_RESOURCE) are use the zend_resource *res member. Resources are covered in the Resources chapter.
+Resources (```IS_RESOURCE```) are use the zend_resource *res member. Resources are covered in the Resources chapter.
 
 To summarize, here’s a table with all the available “normal” type tags and the corresponding storage location for their
 values:
@@ -99,37 +106,38 @@ values:
 | ```IS_OBJECT``` | ```zend_object *obj``` |
 | ```IS_RESOURCE``` | ```zend_resource *res``` |
 
-### Special types 
+### Special types
 
-There are a number of additional types that do not have a directly corresponding userland type, and are
-only used internally. Of these, IS_UNDEF and IS_REFERENCE are the only types you will encounter routinely.
+There are a number of additional types that do not have a directly corresponding userland type, and are only used
+internally. Of these, ```IS_UNDEF``` and ```IS_REFERENCE``` are the only types you will encounter routinely.
 
-The IS_UNDEF type is used to indicate an uninitialized zval. This type tag has a value of zero, so zeroing out a zval
-using memset will result in an UNDEF zval. The exact meaning of IS_UNDEF depends on the context, for example it can
-indicate an unintialized/unset object property, or an unused hashtable bucket.
+The ```IS_UNDEF``` type is used to indicate an uninitialized zval. This type tag has a value of zero, so zeroing out a
+zval using memset will result in an UNDEF zval. The exact meaning of ```IS_UNDEF``` depends on the context, for example
+it can indicate an unintialized/unset object property, or an unused hashtable bucket.
 
-The IS_REFERENCE type in conjunction with the zend_reference *ref member is used to represent a PHP reference. While
-from a userland perspective references are not a separate type, internally references are represented as a wrapper
-around another zval, that can be shared by multiple places.
+The ```IS_REFERENCE``` type in conjunction with the ```zend_reference *ref``` member is used to represent a PHP
+reference. While from a userland perspective references are not a separate type, internally references are represented
+as a wrapper around another zval, that can be shared by multiple places.
 
-The zend_refcounted *counted member accesses a common header for all reference-counted types, including strings, arrays,
-objects, resources and references. How this works is discussed in the memory management chapter.
+The ```zend_refcounted *counted``` member accesses a common header for all reference-counted types, including strings,
+arrays, objects, resources and references. How this works is discussed in the memory management chapter.
 
-The IS_CONSTANT_AST type and zend_ast_ref *ast member are used to store unevaluated constant expression abstract syntax
-trees (ASTs). It can occur only in specific places, such as property default values. ASTs will be discussed in the
-compiler chapter.
+The ```IS_CONSTANT_AST``` type and zend_ast_ref *ast member are used to store unevaluated constant expression abstract
+syntax trees (ASTs). It can occur only in specific places, such as property default values. ASTs will be discussed in
+the compiler chapter.
 
-The IS_INDIRECT type and zval *zv member are used to store a direct pointer to another zval. This is used primarily for
-symbol types and dynamic property tables, in order to point to an actual value stored elsewhere.
+The ```IS_INDIRECT``` type and ```zval *zv``` member are used to store a direct pointer to another zval. This is used
+primarily for symbol types and dynamic property tables, in order to point to an actual value stored elsewhere.
 
-The IS_PTR type together with the void *ptr field are used to store an arbitrary pointer. In C, any pointer type can be
-converted into void * and the other way around. This is used to store pointers in places that normally only accept
-zvals, such as hashtable values.
+The ```IS_PTR``` type together with the ```void *ptr``` field are used to store an arbitrary pointer. In C, any pointer
+type can be converted into void * and the other way around. This is used to store pointers in places that normally only
+accept zvals, such as hashtable values.
 
 The zend_class_entry *ce and zend_function *func members just specify a more precise type, but otherwise serve the same
 purpose as ptr.
 
-## The zval struct 
+## The zval struct
+
 _____
 
 Let’s now have a look at how the zval struct actually looks like:
@@ -164,15 +172,15 @@ struct _zval_struct {
 }; 
 ```
 
-This structure looks a bit more complicated than it really is. At its core, it stores an 8 byte value and a single byte type
-tag, both of which we have already discussed above.
+This structure looks a bit more complicated than it really is. At its core, it stores an 8 byte value and a single byte
+type tag, both of which we have already discussed above.
 
 This would theoretically leave us with a zval size of 9 bytes. However, to allow efficient access, it is necessary to
 align the structure size of an 8 byte boundary, such that the total size becomes 16 bytes. As the additional space will
 be used anyway, PHP makes some use of the “wasted” space:
 
 The type tag is part of a larger type_info structure, which additionally stores type_flags. As of PHP 7.4 there are only
-two type flags: IS_TYPE_REFCOUNTED indicates that the value is reference-counted, while IS_TYPE_COLLECTABLE indicates
+two type flags: ```IS_TYPE_REFCOUNTED``` indicates that the value is reference-counted, while ```IS_TYPE_COLLECTABLE``` indicates
 that it participates in circular garbage collection. We will discuss both of these in the future.
 
 The u2 member is a 32-bit space to store arbitrary data, and is used for different purposes depending on context.
@@ -182,7 +190,8 @@ usages as well. It should be noted that standard zval macros will never modify o
 The u1.v.u.extra field that is part of the type is very rarely used to also store additional information. However, use
 of this field is only possible in very specific circumstances, as PHP will usually assume that it is zero.
 
-## Access macros 
+## Access macros
+
 ___
 
 Knowing the zval structure you can now write code making use of it:
@@ -195,8 +204,8 @@ if (zv_ptr->u1.v.type == IS_LONG) {
 } else /* ... handle other types */
 ``` 
 
-While the above code works, this is not the idiomatic way to write it. It directly
-accesses the zval members rather than using a special set of access macros for this purpose:
+While the above code works, this is not the idiomatic way to write it. It directly accesses the zval members rather than
+using a special set of access macros for this purpose:
 
 ```
 zval *zv_ptr = /* ... */;
@@ -216,7 +225,9 @@ zval zv; zval *zv_ptr;
 Z_TYPE(zv); // Same as Z_TYPE_P(&zv). Z_TYPE_P(zv_ptr); // Same as Z_TYPE(*zv_ptr). 
 ```
 
-Similarly to Z_LVAL there are also macros for fetching values of all the other types. To demonstrate their usage we’ll create a simple function for dumping a zval:
+Similarly to Z_LVAL there are also macros for fetching values of all the other types. To demonstrate their usage we’ll
+create a simple function for dumping a zval:
+
 ```
 PHP_FUNCTION(dump)
 { 
@@ -267,6 +278,7 @@ try_again:
     } 
 } 
 ```
+
 Lets try it out:
 
 ```
@@ -280,24 +292,24 @@ dump(fopen(__FILE__, "r")); // RESOURCE: id=???
 dump(array(1,2, 3)); // ARRAY: hashtable=0x??? 
 dump(new stdClass); // OBJECT: object=0x??? 
 ```
-The following table summarizes the most
-commonly used accessor macros, though there are quite a few more than that.
+
+The following table summarizes the most commonly used accessor macros, though there are quite a few more than that.
 
 | Macro | Returned type | Required zval type | Description |
 | --- | --- | --- | --- |
-| Z_TYPE | unsigned char | | Type of the zval. One of the IS_* constants. |
-| Z_LVAL | zend_long | IS_LONG | Integer value. |
-| Z_DVAL | double | IS_DOUBLE | Floating-point value. |
-| Z_STR | zend_string * | IS_STRING | Pointer to full zend_string structure. |
-| Z_STRVAL | char * | IS_STRING | String contents of the zend_string struct. |
-| Z_STRLEN | size_t | IS_STRING | String length of the zend_string struct. |
-| Z_ARR | HashTable * | IS_ARRAY | Pointer to HashTable structure. |
-| Z_ARRVAL | HashTable * | IS_ARRAY | Alias of Z_ARR. |
-| Z_OBJ | zend_object * | IS_OBJECT | Pointer to zend_object structure. |
-| Z_OBJCE | zend_class_entry * | IS_OBJECT | Class entry of the object. |
-| Z_RES | zend_resource * | IS_RESOURCE | Pointer to zend_resource structure. |
-| Z_REF | zend_reference * | IS_REFERENCE | Pointer to zend_reference structure. |
-| Z_REFVAL | zval * | IS_REFERENCE | Pointer to the zval the reference wraps. |
+| ```Z_TYPE``` | ```unsigned char``` | | Type of the zval. One of the IS_* constants. |
+| ```Z_LVAL``` | ```zend_long``` | ```IS_LONG``` | Integer value. |
+| ```Z_DVAL``` | ```double``` | ```IS_DOUBLE``` | Floating-point value. |
+| ```Z_STR``` | ```zend_string *``` | ```IS_STRING``` | Pointer to full zend_string structure. |
+| ```Z_STRVAL``` | ```char *``` | ```IS_STRING``` | String contents of the zend_string struct. |
+| ```Z_STRLEN``` | ```size_t``` | ```IS_STRING``` | String length of the zend_string struct. |
+| ```Z_ARR``` | ```HashTable *``` | ```IS_ARRAY``` | Pointer to HashTable structure. |
+| ```Z_ARRVAL``` | ```HashTable *``` | ```IS_ARRAY``` | Alias of ```Z_ARR```. |
+| ```Z_OBJ``` | ```zend_object *``` | ```IS_OBJECT``` | Pointer to zend_object structure. |
+| ```Z_OBJCE``` | ```zend_class_entry *``` | ```IS_OBJECT``` | Class entry of the object. |
+| ```Z_RES``` | ```zend_resource *``` | ```IS_RESOURCE``` | Pointer to zend_resource structure. |
+| ```Z_REF``` | ```zend_reference *``` | ```IS_REFERENCE``` | Pointer to zend_reference structure. |
+| ```Z_REFVAL``` | ```zval *``` | ```IS_REFERENCE``` | Pointer to the zval the reference wraps. |
 
 When you want to access the contents of a zval, you should always go through these macros, rather than directly
 accessing its members. This maintains a level of abstraction and will, to some degree, insulate you from changes in the
