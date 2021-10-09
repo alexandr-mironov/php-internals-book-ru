@@ -1,24 +1,29 @@
-# Basic structure
+« [Zvals](/php7/zvals.md) :: [Управление памятью](/php7/zvals/memory_management.md) »
+___
+
+# Базовая (Основная??) структура
 
 ___
 
-A zval (short for “Zend value”) represents an arbitrary PHP value. As such it is likely the most important structure in
-all of PHP and you’ll be working with it a lot. This section describes the basic concepts behind zvals and their use.
+Zval (сокращение от «Zend value») представляет произвольное значение PHP. Таким образом, это, вероятно, самая важная
+структура в весь PHP, и вы будете много работать с ним. В этом разделе описаны основные концепции zval и их
+использование.
 
-## Types and values
+## <a name="types-and-values">Типы и значения</a>
 
 _____
 
-Among other things, every zval stores some value and the type this value has. This is necessary because PHP is a
-dynamically typed language and as such variable types are only known at run-time and not at compile-time. Furthermore,
-the type can change during the life of a zval, so if the zval previously stored an integer it may contain a string at a
-later point in time.
+Среди прочего, каждый zval хранит какое-то значение и тип этого значения. Это необходимо, потому что PHP - это
+динамически типизированный язык, и как таковые типы переменных известны только во время выполнения, а не во время
+компиляции. Более того, тип может измениться в течение жизни zval, поэтому если zval ранее хранил целое число, он может
+содержать строку в более поздний момент времени.
 
-The type is stored as an integer tag, which can take one of several values. Some values correspond to the eight types
-available in PHP, others are used for internal engine purposes only. These values are referred to using constants of the
-form ```IS_TYPE```. E.g. ```IS_NULL``` corresponds to the null type and ```IS_STRING``` corresponds to the string type.
+Тип хранится как целочисленный тег, который может принимать одно из нескольких значений. Некоторые значения
+соответствуют восьми типам доступны в PHP, другие используются только для внутренних целей движка. Эти значения
+упоминаются с помощью констант форма ```IS_TYPE```. Например. ```IS_NULL``` соответствует нулевому типу,
+а ```IS_STRING``` соответствует строковому типу.
 
-The actual value is stored in a union, which is defined as follows:
+Фактическое значение сохраняется в union, которое определяется следующим образом:
 
 ```C
 typedef union _zend_value { 
