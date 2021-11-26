@@ -11,10 +11,10 @@ ____
     * [Почему бы не использовать пакеты?](/php7/build_system/build_php.md#why-not-use-packages)
     * [Получение исходного кода](/php7/build_system/build_php.md#obtaining-the-source-code)
     * [Обзор процесса сборки](/php7/build_system/build_php.md#build-overview)
-    * [The ```./buildconf``` script](/php7/build_system/build_php.md#the-buildconf-script)
-    * [The ```./configure``` script](/php7/build_system/build_php.md#the-configure-script)
-    * [```make``` and ```make install```](/php7/build_system/build_php.md#make-and-make-install)
-    * Running the test suite
+    * [```./buildconf``` скрипт](/php7/build_system/build_php.md#the-buildconf-script)
+    * [```./configure``` скрипт](/php7/build_system/build_php.md#the-configure-script)
+    * [```make``` и ```make install```](/php7/build_system/build_php.md#make-and-make-install)
+    * [Running the test suite](/php7/build_system/build_php.md#)
     * Fixing compilation problems and make clean
   * Building PHP extensions
     * Loading shared extensions
