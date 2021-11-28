@@ -22,14 +22,14 @@ ___
 ## <a name="#why-not-use-packages">Почему бы не использовать пакеты?</a>
 
 _____
-Если Вы уже используете PHP, Вы, вероятно, установили его через диспетчер пакетов, используя команду например ```sudo
-apt-get install php```. Прежде чем объяснять собственно компиляцию, вы должны сначала понять, почему Вам необходимо
-скомпилировать самим и почему нельзя использовать готовую сборку. Для этого есть несколько причин:
+Если Вы уже используете PHP, Вы, вероятно, установили его через диспетчер пакетов, используя команду
+например ```sudo apt-get install php```. Прежде чем объяснять собственно компиляцию, вы должны сначала понять, почему
+Вам необходимо скомпилировать самим и почему нельзя использовать готовую сборку. Для этого есть несколько причин:
 
-Firstly, the prebuilt package only contains the resulting binaries, but misses other things that are necessary to
-compile extensions, e.g. header files. This can be easily remedied by installing a development package, which is
-typically called ```php-dev```. To facilitate debugging with valgrind or gdb one could additionally install debug
-symbols, which are usually available as another package called ```php-dbg```.
+Во-первых, предварительно собранный пакет содержит только результирующие двоичные файлы, но упускает другие вещи,
+необходимые для компиляции расширений, например заголовочные файлы. Это можно легко исправить, установив пакет
+разработки, который обычно называется ```php-dev```. Чтобы облегчить отладку с помощью valgrind или gdb, можно дополнительно
+установить символы отладки, которые обычно доступны в виде другого пакета под названием ```php-dbg```.
 
 But even if you install headers and debug symbols, you’ll still be working with a release build of PHP. This means that
 it will be built with high optimization level, which can make debugging very hard. Furthermore release builds do not
