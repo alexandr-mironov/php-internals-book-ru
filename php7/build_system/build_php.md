@@ -28,17 +28,19 @@ _____
 
 Во-первых, предварительно собранный пакет содержит только результирующие двоичные файлы, но упускает другие вещи,
 необходимые для компиляции расширений, например заголовочные файлы. Это можно легко исправить, установив пакет
-разработки, который обычно называется ```php-dev```. Чтобы облегчить отладку с помощью valgrind или gdb, можно дополнительно
-установить символы отладки, которые обычно доступны в виде другого пакета под названием ```php-dbg```.
+разработки, который обычно называется ```php-dev```. Чтобы облегчить отладку с помощью valgrind или gdb, можно
+дополнительно установить символы отладки, которые обычно доступны в виде другого пакета под названием ```php-dbg```.
 
-But even if you install headers and debug symbols, you’ll still be working with a release build of PHP. This means that
-it will be built with high optimization level, which can make debugging very hard. Furthermore release builds do not
-enable assertions and do not generate warnings about memory leaks. Additionally, prebuilt packages don’t enable thread
-safety, which may be helpful to ensure your extension builds in a thread-safe configuration.
+Но даже если вы установите заголовки и символы отладки, вы все равно будете работать с релизной сборкой PHP. Это
+означает, что он будет построен с высоким уровнем оптимизации, что может сильно затруднить отладку. Кроме того, в
+релизных сборках не включены операторы контроля и не создаются предупреждения об утечках памяти. Дополнительно,
+предварительно созданные пакеты не обеспечивают безопасность потоков, что может быть полезно для обеспечения сборки
+вашего расширения в конфигурации безопасности потоков.
 
-Another issue is that nearly all distributions apply additional patches to PHP. In some cases these patches only contain
-minor changes related to configuration, but some distributions make use of highly intrusive patches like Suhosin. Some
-of these patches are known to introduce incompatibilities with low-level extensions like opcache.
+Другая проблема заключается в том, что почти во всех дистрибутивах к PHP применяются дополнительные патчи. В некоторых
+случаях эти патчи содержат только незначительные изменения, связанные с конфигурацией, но в некоторых дистрибутивах
+используются очень навязчивые патчи, такие как Suhosin. Некоторые из этих патчей несовместимы с низкоуровневыми
+расширениями, такими как opcache.
 
 PHP only provides support for the software as provided on [php.net](https://php.net) and not for the
 distribution-modified versions. If you want to report bugs, submit patches or make use of our help channels for
