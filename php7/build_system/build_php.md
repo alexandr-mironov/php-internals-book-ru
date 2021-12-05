@@ -42,33 +42,34 @@ _____
 используются очень навязчивые патчи, такие как Suhosin. Некоторые из этих патчей несовместимы с низкоуровневыми
 расширениями, такими как opcache.
 
-PHP only provides support for the software as provided on [php.net](https://php.net) and not for the
-distribution-modified versions. If you want to report bugs, submit patches or make use of our help channels for
-extension-writing, you should always work against the official PHP version. When we talk about “PHP” in this book, we’re
-always referring to the officially supported version.
+PHP обеспечивает поддержку только для программного обеспечения, которое предоставляется на [php.net](https://php.net),
+но не для версий с измененными дистрибутивами. Если вы хотите сообщать об ошибках, отправлять исправления или
+использовать наши справочные каналы для написания расширений, вам всегда следует работать с официальной версией "PHP".
+Когда мы говорим о «PHP» в этой книге, мы всегда имеем в виду официально поддерживаемую версию.
 
 ## <a name="obtaining-the-source-code">Получение исходного кода</a>
 
 _____
 
-Before you can build PHP you first need to obtain its source code. There are two ways to do this: You can either
-download an archive from PHP’s download page or clone the git repository from git.php.net (or the mirror on Github).
+Прежде чем вы сможете собрать PHP, вам сперва нужно получить его исходный код. Это можно сделать двумя способами: вы
+можете либо загрузить архив со страницы загрузки PHP, либо клонировать репозиторий git с git.php.net (или зеркала на
+Github).
 
-The build process is slightly different for both cases: The git repository doesn’t bundle a ```configure``` script, so
-you’ll need to generate it using the ```buildconf``` script, which makes use of autoconf. Furthermore the git repository
-does not contain a pregenerated lexer and parser, so you’ll also need to have re2c and bison installed.
+Процесс сборки немного отличается в обоих случаях: репозиторий git не связывает скрипт ```configure```, поэтому вам
+нужно сгенерировать его с помощью скрипта ```buildconf```, который использует autoconf. Кроме того, репозиторий git не
+содержит предварительно сгенерированного лексера и парсера, поэтому вам также потребуется установить re2c и bison.
 
-We recommend to checkout out the source code from git, because this will provide you with an easy way to keep your
-installation updated and to try your code with different versions. A git checkout is also required if you want to submit
-patches or pull requests for PHP.
+Мы рекомендуем получать исходный код из git, потому что это простой способ поддерживать исходники обновленными и
+опробовать свой код с разными версиями. Также требуется проверка с помощью git, если вы хотите отправлять патчи или пулл
+реквесты для PHP.
 
-To clone the repository, run the following commands in your shell:
+Чтобы клонировать репозиторий, выполните следующие команды в командной строке:
 
 ```shell
 ~> git clone http://git.php.net/repository/php-src.git
 ~> cd php-src
-# by default you will be on the master branch, which is the current
-# development version. You can check out a stable branch instead:
+# по умолчанию вы будете в ветке master, которая является текущей версией разработки. 
+# Вместо этого вы можете переключиться на стабильную ветку
 ~/php-src> git checkout PHP-8.0
 ```
 
