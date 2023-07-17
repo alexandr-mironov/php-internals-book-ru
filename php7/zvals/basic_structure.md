@@ -47,6 +47,8 @@ typedef union _zend_value {
 } zend_value; 
 ```
 
+Для тех кто не знаком с концепцией юнионов (unions): Юнион определяет множество членов различного типа, но только один из них может быть использован одновременно.
+
 To those not familiar with the concept of unions: A union defines multiple members of different types, but only one of
 them can ever be used at a time. E.g. if the ```value.lval``` member was set, then you also need to look up the value
 using ```value.lval``` and not one of the other members (doing so would violate “strict aliasing” guarantees and lead to
