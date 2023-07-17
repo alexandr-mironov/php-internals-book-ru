@@ -22,8 +22,8 @@ ____
     * Adding extensions to the PHP source tree
     * Building extensions using phpize
     * Displaying information about extensions
-* Zvals
-  * Basic structure
+* [Zvals](/php7/zvals)
+  * [Основная структура](/php7/zvals/basic_structure.md)
     * Types and values
     * The zval struct
     * Access macros
