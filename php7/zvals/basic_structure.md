@@ -47,14 +47,16 @@ typedef union _zend_value {
 } zend_value; 
 ```
 
-Для тех кто не знаком с концепцией юнионов (unions): Юнион определяет множество членов различного типа, 
+Для тех кто не знаком с концепцией юнионов (unions): Юнион определяет множество элементов различного типа, 
 но только один из них может быть использован одновременно.
 Например, если член `value.lval` был установлен, тогда также необходимо найти значение используя `value.lval` 
-а не одного из других членов (это нарушило бы правило строго алиасинга и привело бы к неопределенному поведению).
+а не одного из других элементов (это нарушило бы правило строго алиасинга и привело бы к неопределенному поведению).
+Причина в том что юнионы хранят все элементы в одной ячейке памяти и просто интерпретируют значение по разному 
+в зависимости от того к какому элементу вы обращаетесь. Размер юниона определяется размером наибольшего элемента.
 
 To those not familiar with the concept of unions: A union defines multiple members of different types, but only one of
-them can ever be used at a time. E.g. if the ```value.lval``` member was set, then you also need to look up the value
-using ```value.lval``` and not one of the other members (doing so would violate “strict aliasing” guarantees and lead to
+them can ever be used at a time. E.g. if the `value.lval` member was set, then you also need to look up the value
+using `value.lval` and not one of the other members (doing so would violate “strict aliasing” guarantees and lead to
 undefined behaviour). The reason is that unions store all their members at the same memory location and just interpret
 the value located there differently depending on which member you access. The size of the union is the size of its
 largest member.
@@ -62,14 +64,14 @@ largest member.
 When working with zvals the type tag is used to find out which of the union’s member is currently in use. Before having
 a look at the APIs used to do so, let’s walk through the different types PHP supports and how they are stored:
 
-The simplest type is ```IS_NULL```: It doesn’t need to actually store any value, because there is just one null value.
+The simplest type is `IS_NULL`: It doesn’t need to actually store any value, because there is just one null value.
 
-Booleans use either the ```IS_TRUE``` or ```IS_FALSE``` types and don’t need to store a value either. PHP internally
+Booleans use either the `IS_TRUE` or `IS_FALSE` types and don’t need to store a value either. PHP internally
 represents true and false as separate types for efficiency reasons, even though these are considered values from a user
-perspective. There also exists an ```_IS_BOOL``` type, however it is never used as a zval type. It is used internally to
+perspective. There also exists an `_IS_BOOL` type, however it is never used as a zval type. It is used internally to
 indicate casts to boolean and similar purposes.
 
-For storing numbers PHP provides the types ```IS_LONG``` and ```IS_DOUBLE```, which make use of the zend_long lval and
+For storing numbers PHP provides the types `IS_LONG` and `IS_DOUBLE`, which make use of the zend_long lval and
 double dval members respectively. The former is used to store integers, whereas the latter stores floating point
 numbers.
 
