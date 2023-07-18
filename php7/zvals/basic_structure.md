@@ -61,7 +61,8 @@ undefined behaviour). The reason is that unions store all their members at the s
 the value located there differently depending on which member you access. The size of the union is the size of its
 largest member.
 
-
+При работе со `zvals` тег `type` используется, чтобы узнать, какой из элементов юниона используется в данный момент. 
+Прежде чем взглянуть на API, давайте рассмотрим различные типы, поддерживаемые PHP, и то, как они хранятся:
 
 When working with zvals the type tag is used to find out which of the union’s member is currently in use. Before having
 a look at the APIs used to do so, let’s walk through the different types PHP supports and how they are stored:
