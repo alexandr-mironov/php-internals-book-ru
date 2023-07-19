@@ -4,7 +4,7 @@ To work with zvals correctly and efficiently, it is important to understand how 
 Broadly, we can classify values into two categories: Simple values like integers, which are stored directly inside the zval, 
 and complex values like strings, for which the zval only stores a pointer to a separate structure.
 
-## Reference-counted values
+## <a name="reference-counted-values">Reference-counted values</a>
 ----
 All complex values share a common header with the following structure:
 
@@ -96,7 +96,7 @@ zend_string_addref(str);
 ```
 Macros that have TRY in the name generally indicate that an operation should only be performed for mutable structures. You’ll encounter more examples like Z_TRY_ADDREF and GC_TRY_PROTECT_RECURSION where the meaning is the same.
 
-## Persistent structures
+### Persistent structures
 ----
 PHP makes use of two allocators: The per-request allocator, which releases all memory at the end of a request, and the persistent allocator, which retains allocations across multiple requests. The persistent allocator is effectively the same as the normal system allocator. See the PHP Lifecycle and Zend Memory Manager chapters for more information on PHP’s allocation management.
 
@@ -108,7 +108,7 @@ However, it is important to understand how persistent structures interact with c
 
 As such, any persistent structure that is also used during the request must either be immutable or thread-local. PHP can be compiled using CFLAGS="-DZEND_RC_DEBUG=1" to diagnose such issues automatically. This problem most typically affects strings, in which case they can be made immutable through interning. The GC_MAKE_PERSISTENT_LOCAL() macro is used to mark a persistent structure as thread-local. This macro doesn’t do anything beyond disabling the ZEND_RC_DEBUG verification.
 
-## Zval memory management
+## <a name="zval-memory-management">Zval memory management</a>
 ----
 With the preliminaries out of the way, we can discuss how memory management interacts with zvals. Refcounted structures can be used independently, but storing them inside zvals is certainly one of the more common use-cases.
 
@@ -126,6 +126,7 @@ zval_ptr_dtor(&str_val); // Decrements to refcount=0, and destroys the string.
 
 A stack-allocated zval can only be used in the scope it was declared in. While it is technically possible to return a zval, you will find that PHP never passes or returns zvals by value. Instead zvals are always passed by pointer. In order to return a zval, an out-parameter needs to be passed to the function:
 
+```C
 // retval is an output parameter.
 void init_zval(zval *retval) {
     ZVAL_STRING(retval, "foo");
@@ -137,8 +138,10 @@ void some_other_function() {
     // ... Do something with val.
     zval_ptr_dtor(&val);
 }
+```
 While zvals themselves are generally not shared, it’s possible to share the structures they point to using the refcounting mechanism. The Z_REFCOUNT, Z_ADDREF and Z_DELREF macros work the same way as the corresponding GC_* macros, but operate on zvals. Importantly, these macros can only be used if the zval does point to a refcounted structure, and the structure is not immutable. The IS_TYPE_REFCOUNTED type flag determines whether this is the case, and can be accessed through Z_REFCOUNTED:
 
+```C
 void fill_array(zval *array) {
     zval val;
     init_zval(&val);
@@ -155,6 +158,7 @@ void fill_array(zval *array) {
 
     zval_ptr_dtor(&val);
 }
+```
 This example adds the same value to an array twice, which means the refcount has to be incremented twice. While it’s possible to manually check whether the zval is Z_REFCOUNTED, it is preferred to use Z_TRY_ADDREF instead, which only increments the refcount for refcounted structures.
 
 Something to consider here is who is responsible for incrementing the refcount. In this example, the caller of add_index_zval() is responsible for the increment. Unfortunately, PHP APIs are not very consistent in this regard. As a very rough rule of thumb, array values expect the refcount to be incremented by the caller, while most other APIs will take care of it themselves.
@@ -162,17 +166,19 @@ Something to consider here is who is responsible for incrementing the refcount. 
 Copying zvals
 It is common that zvals need to be copied from one location to another. For this purpose, a number of copying macros are provided. The first is ZVAL_COPY_VALUE():
 
+```C
 void init_zval_indirect(zval *retval) {
     zval val;
     init_zval(&val);
     ZVAL_COPY_VALUE(retval, &val);
 }
+```
 This (rather silly) example initializes a stack zval and then moves the value over into the retval out parameter. The ZVAL_COPY_VALUE macro performs a simple zval copy without incrementing the refcount. As such, its primary usage is to move a zval, which means that the original zval will no longer be used (which includes that it should not be destroyed). Sometimes, this macro is also used as an optimization to copy a zval that we know not to be refcounted.
 
 The ZVAL_COPY_VALUE macro differs from a simple assignment (*retval = val) in that it only copies the zval value and type, but not its u2 member. As such, it is safe to ZVAL_COPY_VALUE into a zval whose u2 member is in use, as it will not be overwritten.
 
 The second macro is ZVAL_COPY, which is an optimized combination of ZVAL_COPY_VALUE and Z_TRY_ADDREF:
-
+```C
 void init_pair(zval *retval1, zval *retval2) {
     zval val;
     init_zval(&val); // refcount=1
@@ -182,20 +188,25 @@ void init_pair(zval *retval1, zval *retval2) {
 
     zval_ptr_dtor(&val); // refcount=2
 }
+```
 This example copies the value twice, incrementing the refcount (if it has one) twice. A different, and slightly more efficient way to write this function would be:
 
+```C
 void init_pair(zval *retval1, zval *retval2) {
     zval val;
     init_zval(&val); // refcount=1
     ZVAL_COPY(retval1, &val); // refcount=2
     ZVAL_COPY_VALUE(retval2, &val); // refcount=2
 }
+```
 This copies the value once into retval1, and then performs a move into retval2, saving a redundant refcount increment and decrement. Finally, the way we would probably write this code in practice is this:
 
+```C
 void init_pair(zval *retval1, zval *retval2) {
     init_zval(retval1); // refcount=1
     ZVAL_COPY(retval2, retval1); // refcount=2
 }
+```
 Here, the value is directly initialized into retval1 and then copied into retval2. This version is both the simplest and the most efficient.
 
 The ZVAL_DUP macro is similar to ZVAL_COPY, but will duplicate arrays, rather than just incrementing their refcount. If you are using this macro, you are almost certainly doing something very wrong.
