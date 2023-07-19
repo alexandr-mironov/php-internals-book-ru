@@ -259,17 +259,17 @@ opcache and gmp, the corresponding configure command would be:
 ```
 
 By default most extensions will be compiled statically, i.e. they will be part of the resulting binary. Only the opcache
-extension is shared by default, i.e. it will generate an opcache.so shared object in the modules/ directory. You can
-compile other extensions into shared objects as well by writing --enable-NAME=shared or --with-NAME=shared (but not all
+extension is shared by default, i.e. it will generate an `opcache.so` shared object in the `modules/` directory. You can
+compile other extensions into shared objects as well by writing `--enable-NAME=shared` or `--with-NAME=shared` (but not all
 extensions support this). We’ll talk about how to make use of shared extensions in the next section.
 
-To find out which switch you need to use and whether an extension is enabled by default, check ./configure --help. If
-the switch is either ```--enable-NAME``` or --with-NAME it means that the extension is not compiled by default and needs
-to be explicitly enabled. --disable-NAME or --without-NAME on the other hand indicate an extension that is compiled by
+To find out which switch you need to use and whether an extension is enabled by default, check `./configure --help`. If
+the switch is either `--enable-NAME` or `--with-NAME` it means that the extension is not compiled by default and needs
+to be explicitly enabled. `--disable-NAME` or `--without-NAME` on the other hand indicate an extension that is compiled by
 default, but can be explicitly disabled.
 
 Some extensions are always compiled and can not be disabled. To create a build that only contains the minimal amount of
-extensions use the --disable-all option:
+extensions use the `--disable-all` option:
 
 ```shell
 ~/php-src> ./configure --disable-all && make -jN
@@ -278,44 +278,44 @@ extensions use the --disable-all option:
 Core date hash json pcre Reflection SPL standard
 ``` 
 
-The ```--disable-all``` option is very useful if you want a fast build and don’t need much functionality (e.g. when
-implementing language changes). For the smallest possible build you can additionally specify the ```--disable-cgi```
+The `--disable-all` option is very useful if you want a fast build and don’t need much functionality (e.g. when
+implementing language changes). For the smallest possible build you can additionally specify the `--disable-cgi`
 switch, so only the CLI binary is generated.
 
 There are three more switches, which you should usually specify when developing extensions or working on PHP:
 
-```--enable-debug``` enables debug mode, which has multiple effects: Compilation will run with -g to generate debug
+`--enable-debug` enables debug mode, which has multiple effects: Compilation will run with `-g` to generate debug
 symbols and additionally use the lowest optimization level -O0. This will make PHP a lot slower, but make debugging with
-tools like gdb more predictable. Furthermore debug mode defines the ```ZEND_DEBUG``` macro, which will enable th use of
+tools like gdb more predictable. Furthermore debug mode defines the `ZEND_DEBUG` macro, which will enable th use of
 assertions and enable various debugging helpers in the engine. Among other things memory leaks, as well as incorrect use
 of some data structures, will be reported. It is possible to enable debug assertions without disabling optimizations by
 using
-```--enable-debug-assertions``` instead.
+`--enable-debug-assertions` instead.
 
-```--enable-zts``` (or ```--enable-maintainer-zts``` before PHP 8.0) enables thread-safety. This switch will define the
+`--enable-zts` (or `--enable-maintainer-zts` before PHP 8.0) enables thread-safety. This switch will define the
 ZTS macro, which in turn will enable the whole TSRM (thread-safe resource manager) machinery used by PHP. Since PHP 7
 having this switch continuously enabled is much less important than on previous versions. It is primarily important to
 make sure you included all the necessary boilerplate code. If you need more information about thread safety and global
 memory management in PHP, you should read the globals management chapter
 
-```--enable-werror``` (since PHP 7.4) enables the ```-Werror``` compiler flag, which will promote compiler warnings to
+`--enable-werror` (since PHP 7.4) enables the `-Werror` compiler flag, which will promote compiler warnings to
 errors. Enabling this flag ensures that the PHP build remains warning free. However, generated warnings depend on the
 used compiler, version and optimizatino options, so some compilers may not be usable with option.
 
 On the other hand you should not use the --enable-debug option if you want to perform performance benchmarks for your
 code. --enable-zts can also negatively impact runtime performance.
 
-Note that ```--enable-debug``` and ```--enable-zts``` change the ABI of the PHP binary, e.g. by adding additional
+Note that `--enable-debug` and `--enable-zts` change the ABI of the PHP binary, e.g. by adding additional
 arguments to functions. As such, shared extensions compiled in debug mode will not be compatible with a PHP binary built
 in release mode. Similarly a thread-safe extension (ZTS) is not compatible with a non-thread-safe PHP build (NTS).
 
 Due to the ABI incompatibility make install (and PECL install) will put shared extensions in different directories
 depending on these options:
 
-* ```$PREFIX/lib/php/extensions/no-debug-non-zts-API_NO``` for release builds without ZTS
-* ```$PREFIX/lib/php/extensions/debug-non-zts-API_NO``` for debug builds without ZTS
-* ```$PREFIX/lib/php/extensions/no-debug-zts-API_NO``` for release builds with ZTS
-* ```$PREFIX/lib/php/extensions/debug-zts-API_NO``` for debug builds with ZTS
+* `$PREFIX/lib/php/extensions/no-debug-non-zts-API_NO` for release builds without ZTS
+* `$PREFIX/lib/php/extensions/debug-non-zts-API_NO` for debug builds without ZTS
+* `$PREFIX/lib/php/extensions/no-debug-zts-API_NO` for release builds with ZTS
+* `$PREFIX/lib/php/extensions/debug-zts-API_NO` for debug builds with ZTS
 
 The API_NO placeholder above refers to the ZEND_MODULE_API_NO and is just a date like 20100525, which is used for
 internal API versioning.
@@ -324,18 +324,18 @@ For most purposes the configuration switches described above should be sufficien
 many more options, which you’ll find described in the help.
 
 Apart from passing options to configure, you can also specify a number of environment variables. Some of the more
-important ones are documented at the end of the configure help output (```./configure --help | tail -25```).
+important ones are documented at the end of the configure help output (`./configure --help | tail -25`).
 
-For example you can use CC to use a different compiler and CFLAGS to change the used compilation flags:
+For example you can use CC to use a different compiler and `CFLAGS` to change the used compilation flags:
 
 ```shell
 ~/php-src> ./configure --disable-all CC=clang CFLAGS="-O3 -march=native"
 ```
 
-In this configuration the build will make use of clang (instead of gcc) and use a very high optimization level (-O3
--march=native).
+In this configuration the build will make use of clang (instead of gcc) and use a very high optimization level (`-O3
+-march=native`).
 
-An option that is particularly useful for development is -fsanitize, which allows you to detect memory corruption and
+An option that is particularly useful for development is `-fsanitize`, which allows you to detect memory corruption and
 undefined behavior at runtime:
 
 ```shell
@@ -349,13 +349,15 @@ These options only work reliably since PHP 7.4 and will significantly slow down 
 _____
 After everything is configured, you can use make to perform the actual compilation:
 
-~/php-src> make -jN # where N is the number of cores The main result of this operation will be PHP binaries for the
-enabled SAPIs (by default sapi/cli/php and sapi/cgi/php-cgi), as well as shared extensions in the modules/ directory.
+```bash
+~/php-src> make -jN # where N is the number of cores
+```
+The main result of this operation will be PHP binaries for the enabled SAPIs (by default `sapi/cli/php` and `sapi/cgi/php-cgi`), as well as shared extensions in the `modules/` directory.
 
 Now you can run make install to install PHP into /usr/local (default) or whatever directory you specified using the
---prefix configure switch.
+`--prefix configure switch`.
 
-make install will do little more than copy a number of files to the new location. If you specified --with-pear during
+make install will do little more than copy a number of files to the new location. If you specified `--with-pear` during
 configuration, it will also download and install PEAR. Here is the resulting tree of a default PHP build:
 
 ```shell
@@ -381,28 +383,32 @@ configuration, it will also download and install PEAR. Here is the resulting tre
 
 A short overview of the directory structure:
 
-bin/ contains the SAPI binaries (php and php-cgi), as well as the phpize and php-config scripts. It is also home to the
+- `bin/` contains the SAPI binaries (`php` and `php-cgi`), as well as the `phpize` and `php-config` scripts. It is also home to the
 various PEAR/PECL scripts.
 
-etc/ contains configuration. Note that the default php.ini directory is not here.
+- `etc/` contains configuration. Note that the default `php.ini` directory is not here.
 
-include/php contains header files, which are needed to build additional extensions or embed PHP in custom software.
+- `include/php` contains header files, which are needed to build additional extensions or embed PHP in custom software.
 
-lib/php contains PEAR files. The lib/php/build directory includes files necessary for building extensions, e.g. the
-php.m4 file containing PHP’s M4 macros. If we had compiled any shared extensions those files would live in a
-subdirectory of lib/php/extensions.
+- `lib/php` contains PEAR files. The `lib/php/build` directory includes files necessary for building extensions, e.g. the
+`php.m4` file containing PHP’s M4 macros. If we had compiled any shared extensions those files would live in a
+subdirectory of `lib/php/extensions`.
 
-php/man obviously contains man pages for the php command.
+- `php/man` obviously contains man pages for the php command.
 
 As already mentioned, the default php.ini location is not etc/. You can display the location using the --ini option of
 the PHP binary:
 
-~/myphp/bin> ./php --ini Configuration File (php.ini) Path: /home/myuser/myphp/lib Loaded Configuration File:         (
-none)
+```bash
+~/myphp/bin> ./php --ini
+Configuration File (php.ini) Path: /home/myuser/myphp/lib
+Loaded Configuration File:         (none)
 Scan for additional .ini files in: (none)
 Additional .ini files parsed:      (none)
-As you can see the default php.ini directory is $PREFIX/lib (libdir) rather than $PREFIX/etc (sysconfdir). You can
-adjust the default php.ini location using the --with-config-file-path=PATH configure option.
+```
+
+As you can see the default php.ini directory is $PREFIX/lib (libdir) rather than `$PREFIX/etc` (sysconfdir). You can
+adjust the default php.ini location using the `--with-config-file-path=PATH` configure option.
 
 Also note that make install will not create an ini file. If you want to make use of a php.ini file it is your
 responsibility to create one. For example you could copy the default development configuration:
