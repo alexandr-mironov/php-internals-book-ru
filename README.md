@@ -11,9 +11,9 @@ ____
     * [Почему бы не использовать пакеты?](/php7/build_system/build_php.md#why-not-use-packages)
     * [Получение исходного кода](/php7/build_system/build_php.md#obtaining-the-source-code)
     * [Обзор процесса сборки](/php7/build_system/build_php.md#build-overview)
-    * [```./buildconf``` скрипт](/php7/build_system/build_php.md#the-buildconf-script)
-    * [```./configure``` скрипт](/php7/build_system/build_php.md#the-configure-script)
-    * [```make``` и ```make install```](/php7/build_system/build_php.md#make-and-make-install)
+    * [`./buildconf` скрипт](/php7/build_system/build_php.md#the-buildconf-script)
+    * [`./configure` скрипт](/php7/build_system/build_php.md#the-configure-script)
+    * [`make` и `make install`](/php7/build_system/build_php.md#make-and-make-install)
     * [Running the test suite](/php7/build_system/build_php.md#)
     * Fixing compilation problems and make clean
   * Building PHP extensions
@@ -27,9 +27,9 @@ ____
     * Types and values
     * The zval struct
     * Access macros
-  * Memory management
-    * Reference-counted values
-    * Zval memory management
+  * [Memory management](/php7/zvals/memory_management.md)
+    * [Reference-counted values](/php7/zvals/memory_management.md#reference-counted-values)
+    * [Zval memory management](/php7/zvals/memory_management.md#zval-memory-management)
   * References
     * Reference semantics
     * Representation
