@@ -407,20 +407,26 @@ Additional .ini files parsed:      (none)
 As you can see the default php.ini directory is $PREFIX/lib (libdir) rather than `$PREFIX/etc` (sysconfdir). You can
 adjust the default php.ini location using the `--with-config-file-path=PATH` configure option.
 
-Also note that make install will not create an ini file. If you want to make use of a php.ini file it is your
+Also note that make install will not create an ini file. If you want to make use of a `php.ini` file it is your
 responsibility to create one. For example you could copy the default development configuration:
 
+```bash
 ~/myphp/bin> cp ~/php-src/php.ini-development ~/myphp/lib/php.ini
-~/myphp/bin> ./php --ini Configuration File (php.ini) Path: /home/myuser/myphp/lib Loaded Configuration File:
-/home/myuser/myphp/lib/php.ini Scan for additional .ini files in: (none)
+~/myphp/bin> ./php --ini
+Configuration File (php.ini)
+Path: /home/myuser/myphp/lib
+Loaded Configuration File: /home/myuser/myphp/lib/php.ini
+Scan for additional .ini files in: (none)
 Additional .ini files parsed:      (none)
-Apart from the PHP binaries the bin/ directory also contains two important scripts: phpize and php-config.
+```
+Apart from the PHP binaries the bin/ directory also contains two important scripts: `phpize` and `php-config`.
 
-phpize is the equivalent of ./buildconf for extensions. It will copy various files from lib/php/build and invoke
-autoconf/autoheader. You will learn more about this tool in the next section.
+`phpize` is the equivalent of `./buildconf` for extensions. It will copy various files from `lib/php/build` and invoke
+`autoconf/autoheader`. You will learn more about this tool in the next section.
 
-php-config provides information about the configuration of the PHP build. Try it out:
+`php-config` provides information about the configuration of the PHP build. Try it out:
 
+```bash
 ~/myphp/bin> ./php-config Usage: ./php-config [OPTION]
 Options:
 --prefix            [/home/myuser/myphp]
@@ -435,6 +441,7 @@ Options:
 --configure-options [--prefix=/home/myuser/myphp --enable-debug --enable-maintainer-zts]
 --version           [5.4.16-dev]
 --vernum            [50416]
+```
 The script is similar to the pkg-config script used by linux distributions. It is invoked during the extension build
 process to obtain information about compiler options and paths. You can also use it to quickly get information about
 your build, e.g. your configure options or the default extension directory. This information is also provided by ./php
@@ -450,62 +457,77 @@ less for a minimal build, more if you enable additional extensions) this can tak
 The make test command internally invokes the run-tests.php file using your CLI binary. For more control, it is
 recommended to invoke run-tests.php directly. For example, this will allow you to enable the parallel test runner:
 
-~/php-src> sapi/cli/php run-tests.php -jN Test parallelism is only available as of PHP 7.4. On earlier PHP versions
-parallelism is not available, and it is necessary to additionally pass the -P option:
+```bash
+~/php-src> sapi/cli/php run-tests.php -jN
+```
+Test parallelism is only available as of PHP 7.4. On earlier PHP versions parallelism is not available, 
+and it is necessary to additionally pass the `-P` option:
 
-~/php-src> sapi/cli/php run-tests.php -P Instead of running the whole test suite, you can also limit it to certain
-directories by passing them as arguments to run-tests.php. E.g. to test only the Zend engine, the reflection extension
-and the array functions:
+```bash
+~/php-src> sapi/cli/php run-tests.php -P
+```
+Instead of running the whole test suite, you can also limit it to certain directories by passing them as arguments to run-tests.php. 
+E.g. to test only the Zend engine, the reflection extension and the array functions:
 
-~/php-src> sapi/cli/php run-tests.php -jN Zend/ ext/reflection/ ext/standard/tests/array/ This is very useful, because
-it allows you to quickly run only the parts of the test suite that are relevant to your changes. E.g. if you are doing
-language modifications you likely don’t care about the extension tests and only want to verify that the Zend engine is
-still working correctly.
+```bash
+~/php-src> sapi/cli/php run-tests.php -jN Zend/ ext/reflection/ ext/standard/tests/array/
+```
+This is very useful, because it allows you to quickly run only the parts of the test suite that are relevant to your changes. 
+E.g. if you are doing language modifications you likely don’t care about the extension tests 
+and only want to verify that the Zend engine is still working correctly.
 
-You can run sapi/cli/php run-tests.php --help to display a full list of options the test runner accepts. Some
-particularly useful options are:
+You can run `sapi/cli/php run-tests.php --help` to display a full list of options the test runner accepts. 
+Some particularly useful options are:
 
--c php.ini can be used to specify a php.ini file to use.
+- `-c php.ini` can be used to specify a `php.ini` file to use.
 
--d foo=bar can be used to set ini options.
+- `-d foo=bar` can be used to set ini options.
 
--m runs tests under valgrind to detect memory errors. Note that this is extremely slow.
+- `-m` runs tests under valgrind to detect memory errors. Note that this is extremely slow.
 
---asan should be set when compiling PHP with -fsanitize=address. Together these are approximately equivalent to running
+- `--asan` should be set when compiling PHP with `-fsanitize=address`. Together these are approximately equivalent to running
 under valgrind, but with much better performance.
 
-You don’t need to explicitly use run-tests.php to pass options or limit directories. Instead you can use the TESTS
+You don’t need to explicitly use `run-tests.php` to pass options or limit directories. Instead you can use the TESTS
 variable to pass additional arguments via make test. E.g. the equivalent of the previous command would be:
 
+```bash
 ~/php-src> make test TESTS="-jN Zend/ ext/reflection/ ext/standard/tests/array/"
+```
 We will take a more detailed look at the run-tests.php system later, in particular also talk about how to write your own
 tests and how to debug test failures. See the dedicated tests chapter.
 
-Fixing compilation problems and make clean As you may know make performs an incremental build, i.e. it will not
-recompile all files, but only those .c files that changed since the last invocation. This is a great way to shorten
-build times, but it doesn’t always work well: For example, if you modify a structure in a header file, make will not
-automatically recompile all .c files making use of that header, thus leading to a broken build.
+### Fixing compilation problems and `make clean` 
 
-If you get odd errors while running make or the resulting binary is broken (e.g. if make test crashes it before it gets
-to run the first test), you should try to run make clean. This will delete all compiled objects, thus forcing the next
-make call to perform a full build. (You can use ccache to reduce the cost of rebuilds.)
+As you may know `make` performs an incremental build, i.e. it will not recompile all files, 
+but only those `.c` files that changed since the last invocation. 
+This is a great way to shorten build times, but it doesn’t always work well: 
+For example, if you modify a structure in a header file, make will not
+automatically recompile all `.c` files making use of that header, thus leading to a broken build.
 
-Sometimes you also need to run make clean after changing ./configure options. If you only enable additional extensions
+If you get odd errors while running `make` or the resulting binary is broken (e.g. if `make test` crashes it before it gets
+to run the first test), you should try to run `make clean`. This will delete all compiled objects, thus forcing the next
+`make` call to perform a full build. (You can use `ccache` to reduce the cost of rebuilds.)
+
+Sometimes you also need to run `make clean` after changing `./configure` options. If you only enable additional extensions
 an incremental build should be safe, but changing other options may require a full rebuild.
 
 Another source of compilation issues is the modification of config.m4 files or other files that are part of the PHP
-build system. If such a file is changed, it is necessary to rerun the ./buildconf and ./configure scripts. If you do the
+build system. If such a file is changed, it is necessary to rerun the `./buildconf` and `./configure` scripts. If you do the
 modification yourself, you will likely remember to run the command, but if it happens as part of a git pull (or some
 other updating command) the issue might not be so obvious.
 
-If you encounter any odd compilation problems that are not resolved by make clean, chances are that running ./buildconf
-will fix the issue. To avoid typing out the previous ./configure options afterwards, you can make use of the
-./config.nice script (which contains your last ./configure call):
+If you encounter any odd compilation problems that are not resolved by make clean, chances are that running `./buildconf`
+will fix the issue. To avoid typing out the previous `./configure` options afterwards, you can make use of the
+`./config.nice` script (which contains your last `./configure` call):
 
+```bash
 ~/php-src> make clean
 ~/php-src> ./buildconf --force
 ~/php-src> ./config.nice
-~/php-src> make -jN One last cleaning script that PHP provides is ./vcsclean. This will only work if you checked out the
-source code from git. It effectively boils down to a call to git clean -X -f -d, which will remove all untracked files
+~/php-src> make -jN
+```
+One last cleaning script that PHP provides is `./vcsclean`. This will only work if you checked out the
+source code from git. It effectively boils down to a call to `git clean -X -f -d`, which will remove all untracked files
 and directories that are ignored by git. You should use this with care.
 
