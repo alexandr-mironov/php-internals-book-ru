@@ -78,37 +78,32 @@ _____
 каталоги для разных версий PHP. Это может быть очень полезно, если вам нужно проверить свои расширения или изменения на
 несколько версий и конфигураций PHP.
 
-If you have issues with the git checkout, take a look at the [Git FAQ](https://wiki.php.net/vcs/gitfaq) on the PHP wiki. The Git FAQ also explains how to
-setup git if you want to contribute to PHP itself. Furthermore it contains instructions on setting up multiple working
-directories for different PHP versions. This can be very useful if you need to test your extensions or changes against
-multiple PHP versions and configurations.
+Прежде чем продолжить, вам также следует установить некоторые базовые зависимости сборки с помощью вашего менеджера пакетов 
+(у вас, вероятно, уже установлены первые три по умолчанию):
 
-Before continuing, you should also install some basic build dependencies with your package manager (you’ll likely
-already have the first three installed by default):
+* `gcc` и `g++` или какой либо другой набор инструментов компилятора.
 
-* ```gcc``` and ```g++``` or some other compiler toolchain.
+* `libc-dev`, который предоставляет стандартную библиотеку C, включая файлы заголовков.
 
-* ```libc-dev```, which provides the C standard library, including headers.
+* `make`, который является инструментом управления сборкой, используемым в PHP.
 
-* ```make```, which is the build-management tool PHP uses.
+* `autoconf`, который используется для создания скрипта `configure`.
 
-* ```autoconf```, which is used to generate the ```configure``` script.
+    * 2.59 или выше (для PHP 7.0-7.1)
 
-    * 2.59 or higher (for PHP 7.0-7.1)
+    * 2.64 или выше (для PHP 7.2)
 
-    * 2.64 or higher (for PHP 7.2)
+    * 2.68 или выше (для PHP 7.3 и выше)
 
-    * 2.68 or higher (for PHP 7.3 and higher)
+* `libtool`, which helps manage shared libraries.
 
-* ```libtool```, which helps manage shared libraries.
-
-* ```bison``` which is used to generate the PHP parser.
+* `bison` which is used to generate the PHP parser.
 
     * 2.4 or higher (for PHP 7.0-7.3)
 
     * 3.0 or higher (for PHP 7.4 and higher)
 
-* ```re2c```, which is used to generate the PHP lexer.
+* `re2c`, which is used to generate the PHP lexer.
 
     * Optional for PHP <= 7.3.
 
@@ -118,13 +113,13 @@ On Debian/Ubuntu you can install all these with the following command:
 
 ```shell
 ~/php-src> sudo apt-get install build-essential autoconf libtool bison re2c
-``` 
+```
 
-Depending on the extensions that you enable during the ```./configure``` stage PHP will need a number of additional
-libraries. When installing these, check if there is a version of the package ending in ```-dev``` or ```-devel``` and
-install them instead. The packages without ```dev``` typically do not contain necessary header files. For example a
-default PHP build will require libxml and libsqlite3, which you can install via the ```libxml2-dev```
-and ```libsqlite3-dev``` packages.
+Depending on the extensions that you enable during the `./configure` stage PHP will need a number of additional
+libraries. When installing these, check if there is a version of the package ending in `-dev` or `-devel` and
+install them instead. The packages without `dev` typically do not contain necessary header files. For example a
+default PHP build will require libxml and libsqlite3, which you can install via the `libxml2-dev`
+and `libsqlite3-dev` packages.
 
 ## <a name="#build-overview">Обзор процесса сборки</a>
 
@@ -139,14 +134,14 @@ Before taking a closer look at what the individual build steps do, here are the 
 ~/php-src> make -jN 
 ```
 
-For a fast build, replace N with the number of CPU cores you have available (you can run ```nproc``` to determine this).
+For a fast build, replace N with the number of CPU cores you have available (you can run `nproc` to determine this).
 
-By default PHP will build binaries for the CLI and CGI SAPIs, which will be located at ```sapi/cli/php```
-and ```sapi/cgi/php-cgi```
-respectively. To check that everything went well, try running ```sapi/cli/php -v```.
+By default PHP will build binaries for the CLI and CGI SAPIs, which will be located at `sapi/cli/php`
+and `sapi/cgi/php-cgi`
+respectively. To check that everything went well, try running `sapi/cli/php -v`.
 
-Additionally you can run ```sudo make install``` to install PHP into ```/usr/local```. The target directory can be
-changed by specifying a ```--prefix``` in the configuration stage:
+Additionally you can run `sudo make install` to install PHP into `/usr/local`. The target directory can be
+changed by specifying a `--prefix` in the configuration stage:
 
 ```shell
 ~/php-src> ./configure --prefix=$HOME/myphp
@@ -154,7 +149,7 @@ changed by specifying a ```--prefix``` in the configuration stage:
 ~/php-src> make install
 ```
 
-Here ```$HOME/myphp``` is the installation location that will be used during the ```make install``` step. Note that
+Here `$HOME/myphp` is the installation location that will be used during the `make install` step. Note that
 installing PHP is not necessary, but can be convenient if you want to use your PHP build outside of extension
 development.
 
@@ -164,30 +159,27 @@ Now lets take a closer look at the individual build steps!
 
 _____
 
-If you are building from the git repository, the first thing you’ll have to do is run the ```./buildconf``` script. This
-script does little more than invoking the ```build/build.mk``` makefile, which in turn calls ```build/build2.mk```.
+If you are building from the git repository, the first thing you’ll have to do is run the `./buildconf` script. This
+script does little more than invoking the `build/build.mk` makefile, which in turn calls `build/build2.mk`.
 
-The main job of these makefiles is to run ```autoconf``` to generate the ```./configure``` script and ```autoheader```
-to generate the
-```main/php_config.h.in``` template. The latter file will be used by configure to generate the final configuration
-header file
-```main/php_config.h```.
+The main job of these makefiles is to run `autoconf` to generate the `./configure` script and `autoheader`
+to generate the `main/php_config.h.in` template. 
+The latter file will be used by configure to generate the final configuration header file `main/php_config.h`.
 
 Both utilities produce their results from the configure.ac file (which specifies most of the PHP build process), the
-```build/php.m4``` file (which specifies a large number of PHP-specific M4 macros) and the config.m4 files of individual
+`build/php.m4` file (which specifies a large number of PHP-specific M4 macros) and the config.m4 files of individual
 extensions and SAPIs (as well as a bunch of other [m4 files](http://www.gnu.org/software/m4/m4.html)).
 
 The good news is that writing extensions or even doing core modifications will not require much interaction with the
-build system. You will have to write small ```config.m4``` files later on, but those usually just use two or three of
-the high-level macros that ```build/php.m4``` provides. As such we will not go into further detail here.
+build system. You will have to write small `config.m4` files later on, but those usually just use two or three of
+the high-level macros that `build/php.m4` provides. As such we will not go into further detail here.
 
-The ```./buildconf``` script only has two options: ```--debug``` will disable warning suppression when calling autoconf
+The `./buildconf` script only has two options: `--debug` will disable warning suppression when calling autoconf
 and autoheader. Unless you want to work on the buildsystem, this option will be of little interest to you.
 
-The second option is ```--force```, which will allow running ```./buildconf``` in release packages (e.g. if you
-downloaded the packaged source code and want to generate a new ```./configure```) and additionally clear the
-configuration caches
-```config.cache``` and ```autom4te.cache/```.
+The second option is `--force`, which will allow running `./buildconf` in release packages (e.g. if you
+downloaded the packaged source code and want to generate a new `./configure`) and additionally clear the
+configuration caches `config.cache` and `autom4te.cache/`.
 
 If you update your git repository using git pull (or some other command) and get weird errors during the make step, this
 usually means that something in the build configuration changed and you need to rerun ./buildconf.
@@ -196,25 +188,25 @@ usually means that something in the build configuration changed and you need to 
 
 _____
 
-Once the ```./configure``` script is generated you can make use of it to customize your PHP build. You can list all
-supported options using ```--help```:
+Once the `./configure` script is generated you can make use of it to customize your PHP build. You can list all
+supported options using `--help`:
 
 ```shell
 ~/php-src> ./configure --help | less 
 ```
 
 The first part of the help will list various generic options, which are supported by all autoconf-based configuration
-scripts. One of them is the already mentioned --prefix=DIR, which changes the installation directory used by make
-install. Another useful option is -C, which will cache the result of various tests in the config.cache file and speed up
-subsequent ./configure calls. Using this option only makes sense once you already have a working build and want to
+scripts. One of them is the already mentioned `--prefix=DIR`, which changes the installation directory used by make
+install. Another useful option is `-C`, which will cache the result of various tests in the config.cache file and speed up
+subsequent `./configure` calls. Using this option only makes sense once you already have a working build and want to
 quickly change between different configurations.
 
 Apart from generic autoconf options there are also many settings specific to PHP. For example, you can choose which
-extensions and SAPIs should be compiled using the --enable-NAME and --disable-NAME switches. If the extension or SAPI
+extensions and SAPIs should be compiled using the `--enable-NAME` and `--disable-NAME` switches. If the extension or SAPI
 has external dependencies you need to use --with-NAME and --without-NAME instead.
 
 If a library needed by NAME is not located in the default location (e.g. because you compiled it yourself), some
-extensions allow you to specify its location using --with-NAME=DIR. However, since PHP 7.4 most extensions use
+extensions allow you to specify its location using `--with-NAME=DIR`. However, since PHP 7.4 most extensions use
 pkg-config instead, in which case passing a directory to --with has no effect. In this case, it is necessary to add the
 library to the PKG_CONFIG_PATH:
 
@@ -255,8 +247,8 @@ xmlreader
 xmlwriter 
 ```
 
-If you now wanted to stop compiling the CGI SAPI, as well as the tokenizer and sqlite3 extensions and instead enable
-opcache and gmp, the corresponding configure command would be:
+If you now wanted to stop compiling the CGI SAPI, as well as the `tokenizer` and `sqlite3` extensions and instead enable
+`opcache` and `gmp`, the corresponding configure command would be:
 
 ```shell
 ~/php-src> ./configure --disable-cgi --disable-tokenizer --without-sqlite3 \
