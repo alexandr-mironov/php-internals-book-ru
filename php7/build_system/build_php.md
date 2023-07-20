@@ -83,11 +83,11 @@ _____
 
 * `gcc` и `g++` или какой либо другой набор инструментов компилятора.
 
-* `libc-dev`, который предоставляет стандартную библиотеку C, включая файлы заголовков.
+* `libc-dev` - предоставляет стандартную библиотеку C, включая файлы заголовков.
 
-* `make`, который является инструментом управления сборкой, используемым в PHP.
+* `make` - инструмент управления сборкой используемый в PHP.
 
-* `autoconf`, который используется для создания скрипта `configure`.
+* `autoconf` - используется для создания скрипта `configure`.
 
     * 2.59 или выше (для PHP 7.0-7.1)
 
@@ -95,25 +95,28 @@ _____
 
     * 2.68 или выше (для PHP 7.3 и выше)
 
-* `libtool`, which helps manage shared libraries.
+* `libtool` - помогает управлять общими библиотеками.
 
-* `bison` which is used to generate the PHP parser.
+* `bison` - используется для генерации парсера PHP.
 
-    * 2.4 or higher (for PHP 7.0-7.3)
+    * 2.4 или выше (для PHP 7.0-7.3)
 
-    * 3.0 or higher (for PHP 7.4 and higher)
+    * 3.0 или выше (для PHP 7.4 или выше)
 
-* `re2c`, which is used to generate the PHP lexer.
+* `re2c` - используется для генерации лексера PHP.
 
-    * Optional for PHP <= 7.3.
+    * опционально для PHP <= 7.3.
 
-    * 0.13.4 or higher (for PHP 7.4 and higher)
+    * 0.13.4 и выше (для PHP 7.4 и выше)
 
-On Debian/Ubuntu you can install all these with the following command:
+В Debian/Ubuntu вы можете установить всё это следующей командной:
 
 ```shell
 ~/php-src> sudo apt-get install build-essential autoconf libtool bison re2c
 ```
+
+В зависимости от расширений которые вы включили на этапе `./configure`, PHP может потребовать определенное количество дополнительных библиотек.
+
 
 Depending on the extensions that you enable during the `./configure` stage PHP will need a number of additional
 libraries. When installing these, check if there is a version of the package ending in `-dev` or `-devel` and
