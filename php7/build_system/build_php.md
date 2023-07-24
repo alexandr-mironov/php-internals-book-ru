@@ -116,7 +116,9 @@ _____
 ```
 
 В зависимости от расширений которые вы включили на этапе `./configure`, PHP может потребовать определенное количество дополнительных библиотек.
-
+При их установке проверьте, есть ли версия пакета оканчивающаяся на `-dev` или `-devel`, и установите их. 
+Пакеты без `dev` обычно не содержат необходимых заголовочных файлов. 
+Например, для сборки PHP по умолчанию потребуются `libxml` и `libsqlite3`, которые вы можете установить с помощью пакетов `libxml2-dev` и `libsqlite3-dev`.
 
 Depending on the extensions that you enable during the `./configure` stage PHP will need a number of additional
 libraries. When installing these, check if there is a version of the package ending in `-dev` or `-devel` and
@@ -128,6 +130,8 @@ and `libsqlite3-dev` packages.
 
 _____
 
+Прежде чем более более детально рассмотреть что делают отдельные шаги сборки, команды ниже используются для сборки PHP «по умолчанию»:
+
 Before taking a closer look at what the individual build steps do, here are the commands you need to execute for a
 “default” PHP build:
 
@@ -136,6 +140,8 @@ Before taking a closer look at what the individual build steps do, here are the 
 ~/php-src> ./configure
 ~/php-src> make -jN 
 ```
+
+Для быстрой сборки замените N на количество ядер CPU которое Вам доступно (можно определить запустив `nproc`) 
 
 For a fast build, replace N with the number of CPU cores you have available (you can run `nproc` to determine this).
 
