@@ -173,16 +173,26 @@ Note that installing PHP is not necessary, but can be convenient if you want to 
 
 Now lets take a closer look at the individual build steps!
 
-## <a name="#the-buildconf-script">The ./buildconf script</a>
+## <a name="#the-buildconf-script">Скрипт ./buildconf</a>
 
 _____
 
-If you are building from the git repository, the first thing you’ll have to do is run the `./buildconf` script. This
-script does little more than invoking the `build/build.mk` makefile, which in turn calls `build/build2.mk`.
+Если вы выполняете сборку из репозитория git, первое что Вы должны сделать это запустить скрипт `./buildconf`.
+Этот скрипт делает немного больше чем запускает make-файл `build/build.mk`, который в свою очередь запускает `build/build2.mk`.
+
+If you are building from the git repository, the first thing you’ll have to do is run the `./buildconf` script. 
+This script does little more than invoking the `build/build.mk` makefile, which in turn calls `build/build2.mk`.
+
+Основная задача этих make-файлов — запустить `autoconf` для генерации скрипта `./configure` и `autoheader` для создания шаблона `main/php_config.h.in`.
+Последний файл будет использоваться `configure` для создания окончательного файла заголовка конфигурации `main/php_config.h`. 
 
 The main job of these makefiles is to run `autoconf` to generate the `./configure` script and `autoheader`
 to generate the `main/php_config.h.in` template. 
 The latter file will be used by configure to generate the final configuration header file `main/php_config.h`.
+
+Обе утилиты получают свои результаты из файла `configure.ac` (который определяет большую часть процесса сборки PHP), 
+файла `build/php.m4` (который определяет большое количество специфичных для PHP макросов M4) 
+и файлов `config.m4` отдельных расширений и SAPI (а также множества других [файлов m4](http://www.gnu.org/software/m4/m4.html)). 
 
 Both utilities produce their results from the configure.ac file (which specifies most of the PHP build process), the
 `build/php.m4` file (which specifies a large number of PHP-specific M4 macros) and the config.m4 files of individual
