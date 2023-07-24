@@ -173,7 +173,7 @@ Note that installing PHP is not necessary, but can be convenient if you want to 
 
 Now lets take a closer look at the individual build steps!
 
-## <a name="#the-buildconf-script">Скрипт ./buildconf</a>
+## <a name="#the-buildconf-script">Скрипт `./buildconf`</a>
 
 _____
 
@@ -198,21 +198,34 @@ Both utilities produce their results from the configure.ac file (which specifies
 `build/php.m4` file (which specifies a large number of PHP-specific M4 macros) and the config.m4 files of individual
 extensions and SAPIs (as well as a bunch of other [m4 files](http://www.gnu.org/software/m4/m4.html)).
 
+Хорошая новость в том, что написание расширений или даже внесение изменений в ядро не потребует большого взаимодействия с системой сборки. 
+Позже вам придется написать небольшие файлы `config.m4`, но обычно они просто используют два или три высокоуровневых макроса, которые предоставляет `build/php.m4`. 
+Поэтому мы не будем здесь вдаваться в подробности.
+
 The good news is that writing extensions or even doing core modifications will not require much interaction with the
 build system. You will have to write small `config.m4` files later on, but those usually just use two or three of
 the high-level macros that `build/php.m4` provides. As such we will not go into further detail here.
 
+Скрипт `./buildconf` имеет только две опции: `--debug` отключит подавление предупреждений при вызове autoconf и autoheader. 
+Если вы не хотите работать над системой сборки, этот вариант вас мало интересует.
+
 The `./buildconf` script only has two options: `--debug` will disable warning suppression when calling autoconf
 and autoheader. Unless you want to work on the buildsystem, this option will be of little interest to you.
+
+Второй параметр — `--force`, который позволит запускать `./buildconf` в релизных пакетах (например, если вы загрузили упакованный исходный код 
+и хотите сгенерировать новый `./configure`) и дополнительно очистить кеши конфигурации `config.cache` и `autom4te.cache/`.
 
 The second option is `--force`, which will allow running `./buildconf` in release packages (e.g. if you
 downloaded the packaged source code and want to generate a new `./configure`) and additionally clear the
 configuration caches `config.cache` and `autom4te.cache/`.
 
+Если вы обновляете свой репозиторий git с помощью `git pull` (или какой-либо другой команды) и получаете странные ошибки на этапе make, 
+это обычно означает, что что-то в конфигурации сборки изменилось, и вам нужно перезапустить `./buildconf`.
+
 If you update your git repository using git pull (or some other command) and get weird errors during the make step, this
 usually means that something in the build configuration changed and you need to rerun ./buildconf.
 
-## <a name="#the-configure-script">The ./configure script</a>
+## <a name="#the-configure-script">Скрипт `./configure`</a>
 
 _____
 
