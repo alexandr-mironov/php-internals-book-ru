@@ -145,9 +145,14 @@ Before taking a closer look at what the individual build steps do, here are the 
 
 For a fast build, replace N with the number of CPU cores you have available (you can run `nproc` to determine this).
 
-By default PHP will build binaries for the CLI and CGI SAPIs, which will be located at `sapi/cli/php`
-and `sapi/cgi/php-cgi`
-respectively. To check that everything went well, try running `sapi/cli/php -v`.
+По умолчанию PHP собирает бинарные файлы для CLI и CGI SAPI, которые будут расположены в `sapi/cli/php` и  `sapi/cgi/php-cgi` соответственно.
+Убедиться в успешном завершении можно запустив `sapi/cli/php -v`.
+
+By default PHP will build binaries for the CLI and CGI SAPIs, which will be located at `sapi/cli/php` and `sapi/cgi/php-cgi` respectively. 
+To check that everything went well, try running `sapi/cli/php -v`.
+
+Дополнительно можно запустить `sudo make install` чтобы установить PHP в `/usr/local`. 
+Целевая директория может быть изменена указанием `--prefix` на этапе конфигурирования:
 
 Additionally you can run `sudo make install` to install PHP into `/usr/local`. The target directory can be
 changed by specifying a `--prefix` in the configuration stage:
@@ -158,9 +163,13 @@ changed by specifying a `--prefix` in the configuration stage:
 ~/php-src> make install
 ```
 
-Here `$HOME/myphp` is the installation location that will be used during the `make install` step. Note that
-installing PHP is not necessary, but can be convenient if you want to use your PHP build outside of extension
-development.
+Здесь `$HOME/myphp` место установки, которое будет использоваться во время шага `make install`. 
+Обратите внимание, что установка PHP не обязательна, но может быть удобной, если вы хотите использовать сборку PHP вне разработки расширений.
+
+Here `$HOME/myphp` is the installation location that will be used during the `make install` step. 
+Note that installing PHP is not necessary, but can be convenient if you want to use your PHP build outside of extension development.
+
+Теперь рассмотрим подробнее отдельные шаги сборки!
 
 Now lets take a closer look at the individual build steps!
 
